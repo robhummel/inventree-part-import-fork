@@ -4,7 +4,7 @@ import traceback
 from enum import Enum
 from multiprocessing.pool import AsyncResult, ThreadPool
 from string import Formatter
-from typing import Any, Mapping, Self, Sequence, cast
+from typing import TYPE_CHECKING, Any, Mapping, Self, Sequence, cast
 
 from cutie import select
 from error_helper import BOLD, BOLD_END, error, hint, info, prompt, prompt_input, success, warning
@@ -32,6 +32,9 @@ from .inventree_helpers import (
 from .suppliers import search
 from .suppliers.base import ApiPart
 
+if TYPE_CHECKING:
+    from .categories import CategoryCreator
+
 
 class ImportResult(Enum):
     ERROR = 0
@@ -45,10 +48,15 @@ class ImportResult(Enum):
 
 class PartImporter:
     def __init__(
-        self, inventree_api: InvenTreeAPI, interactive: bool = False, verbose: bool = False
+        self,
+        inventree_api: InvenTreeAPI,
+        interactive: bool = False,
+        allow_category_creation: bool = False,
+        verbose: bool = False,
     ):
         self.api = inventree_api
         self.interactive = interactive
+        self.allow_category_creation = allow_category_creation
         self.verbose = verbose
 
         # preload pre_creation_hooks
@@ -62,6 +70,8 @@ class PartImporter:
             for category in self.category_map.values()
         }
         self.categories = set(self.category_map.values())
+
+        self.category_creator: "CategoryCreator | None" = None
 
     def import_part(
         self,
@@ -184,7 +194,11 @@ class PartImporter:
         else:
             if not api_part.finalize():
                 return ImportResult.FAILURE
-            result = self.create_manufacturer_part(api_part, part)
+            result = self.create_manufacturer_part(
+                api_part,
+                part,
+                category_creator=self.category_creator if supplier.name == "DigiKey" else None,
+            )
             if isinstance(result, ImportResult):
                 return result
             manufacturer_part, part = result
@@ -251,7 +265,8 @@ class PartImporter:
         self,
         api_part: ApiPart,
         part: Part | None = None,
-    ):
+        category_creator: "CategoryCreator | None" = None,
+    ) -> "tuple[ManufacturerPart, Part] | ImportResult":
         part_data = api_part.get_part_data()
         if part or (part := get_part(self.api, api_part.MPN)):
             update_object_data(part, part_data, f"part {api_part.MPN}")
@@ -266,7 +281,11 @@ class PartImporter:
                     return ImportResult.FAILURE
 
                 prompt(f"failed to match category for '{path_str}', select category")
-                if not (category := self.select_category(api_part.category_path)):
+                if not (category := self.select_category(
+                    api_part.category_path,
+                    api_part=api_part,
+                    category_creator=category_creator,
+                )):
                     return ImportResult.FAILURE
 
                 category.add_alias(api_part.category_path[-1])
@@ -292,7 +311,12 @@ class PartImporter:
 
         return manufacturer_part, part
 
-    def select_category(self, category_path: list[str]):
+    def select_category(
+        self,
+        category_path: list[str],
+        api_part: ApiPart | None = None,
+        category_creator: "CategoryCreator | None" = None,
+    ) -> Category | None:
         search_terms = [category_path[-1], " ".join(category_path[-2:])]
 
         def rate_category(category: Category):
