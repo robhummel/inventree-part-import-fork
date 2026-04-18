@@ -59,7 +59,7 @@ _suppliers, _available_suppliers = get_suppliers(setup=False)
 SuppliersChoices = click.Choice(_suppliers.keys(), case_sensitive=False)
 AvailableSuppliersChoices = click.Choice(_available_suppliers.keys(), case_sensitive=False)
 
-InteractiveChoices = click.Choice(("default", "false", "true", "twice"), case_sensitive=False)
+InteractiveChoices = click.Choice(("default", "false", "true", "twice", "twice-add"), case_sensitive=False)
 
 
 @click.group(invoke_without_command=True)
@@ -74,7 +74,8 @@ InteractiveChoices = click.Choice(("default", "false", "true", "twice"), case_se
     default="default",
     help=(
         "Enable interactive mode. 'twice' will run once normally, then rerun in interactive "
-        "mode for any parts that failed to import correctly."
+        "mode for any parts that failed to import correctly. 'twice-add' behaves like 'twice' "
+        "but also allows creating missing categories and parameters from DigiKey data."
     ),
 )
 @click.option("-d", "--dry", is_flag=True, help="Run without modifying InvenTree database.")
@@ -97,7 +98,7 @@ def inventree_part_import(
     inputs: list[str],
     supplier: str | None = None,
     only: str | None = None,
-    interactive: Literal["default", "false", "true", "twice"] = "false",
+    interactive: Literal["default", "false", "true", "twice", "twice-add"] = "false",
     dry: bool = False,
     config_dir: Path | None = None,
     verbose: bool = False,
@@ -227,7 +228,12 @@ def inventree_part_import(
     # make sure suppliers.yaml exists
     get_suppliers(reload=True)
     setup_supplier_companies(inventree_api)
-    importer = PartImporter(inventree_api, interactive=interactive == "true", verbose=verbose)
+    importer = PartImporter(
+        inventree_api,
+        interactive=interactive == "true",
+        allow_category_creation=interactive == "twice-add",
+        verbose=verbose,
+    )
 
     if update or update_recursive:
         info(f"updating {len(parts)} parts from '{category_path}'", end="\n")
@@ -258,7 +264,7 @@ def inventree_part_import(
                     incomplete_parts.append(part)
 
         parts2 = [*failed_parts, *incomplete_parts]
-        if parts2 and interactive == "twice" and last_import_result != ImportResult.ERROR:
+        if parts2 and interactive in {"twice", "twice-add"} and last_import_result != ImportResult.ERROR:
             success("reimporting failed/incomplete parts in interactive mode ...\n", prefix="")
             failed_parts = []
             incomplete_parts = []
