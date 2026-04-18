@@ -336,17 +336,32 @@ class PartImporter:
 
         max_matches = int(get_config().get("interactive_category_matches", 5))
         N_MATCHES = min(max_matches, len(category_matches))
+        create_option = category_creator is not None and api_part is not None
         choices = [
             *(" / ".join(category.path) for category in category_matches[:N_MATCHES]),
+            *(
+                [f"{BOLD}Create New Category ...{BOLD_END}"]
+                if create_option
+                else []
+            ),
             f"{BOLD}Enter Manually ...{BOLD_END}",
             f"{BOLD}Skip ...{BOLD_END}",
         ]
+        CREATE_IDX = N_MATCHES if create_option else -1
+        MANUAL_IDX = N_MATCHES + (1 if create_option else 0)
+        SKIP_IDX = MANUAL_IDX + 1
         while True:
             index = select(choices, deselected_prefix="  ", selected_prefix="> ")
-            if index == N_MATCHES + 1:
+            if index == SKIP_IDX:
                 return None
             elif index < N_MATCHES:
                 return category_matches[index]
+            elif index == CREATE_IDX:
+                assert category_creator is not None and api_part is not None
+                category = category_creator.create_from_api_part(api_part)
+                if category is not None:
+                    self.categories.add(category)
+                return category
 
             name = prompt_input("category name")
             if (category := self.category_map.get(name.lower())) and category.name == name:
