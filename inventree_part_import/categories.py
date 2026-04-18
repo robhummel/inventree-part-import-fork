@@ -570,7 +570,44 @@ class CategoryCreator:
     def _select_parameters(
         self, api_parameters: dict[str, str]
     ) -> tuple[list[str], dict[str, str]]:
-        raise NotImplementedError
+        param_names = list(api_parameters.keys())
+        param_values = list(api_parameters.values())
+
+        max_val_len = max((len(v) for v in param_values), default=0)
+        choices = [
+            f"{v.ljust(max_val_len)} | {n}"
+            for n, v in zip(param_names, param_values)
+        ]
+
+        ticked = [
+            i
+            for i, name in enumerate(param_names)
+            if any(fuzz.partial_ratio(name.lower(), key) >= 80 for key in self.parameter_map)
+        ]
+
+        prompt(
+            "select parameters to add to this category "
+            "(SPACEBAR to toggle, ENTER to confirm)",
+            end="\n",
+        )
+        selected_indices = select_multiple(
+            choices,
+            ticked_indices=ticked,
+            deselected_unticked_prefix="  [ ] ",
+            deselected_ticked_prefix="  [x] ",
+            selected_unticked_prefix="> [ ] ",
+            selected_ticked_prefix="> [x] ",
+        )
+
+        selected_names = [param_names[i] for i in selected_indices]
+
+        new_param_units: dict[str, str] = {}
+        for name in selected_names:
+            if not any(fuzz.partial_ratio(name.lower(), key) >= 80 for key in self.parameter_map):
+                units = prompt_input(f"units for '{name}' (blank if none)") or ""
+                new_param_units[name] = units
+
+        return selected_names, new_param_units
 
     def _write_configs(
         self, path: list[str], param_names: list[str], new_param_units: dict[str, str]

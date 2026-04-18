@@ -100,3 +100,32 @@ def test_create_inventree_categories_skips_existing(mock_create, mock_list):
     mock_create.assert_called_once_with(
         creator.api, {"name": "B", "description": "B", "structural": False, "parent": 10}
     )
+
+@patch("inventree_part_import.categories.prompt_input", return_value="V")
+@patch("inventree_part_import.categories.select_multiple", return_value=[0, 1])
+def test_select_parameters_pre_ticks_existing_and_prompts_units_for_new(
+    mock_select_multiple, mock_input
+):
+    # "Capacitance" matches existing parameter_map entry; "NewParam" does not
+    parameter_map = {"capacitance": [Parameter("Capacitance", "Capacitance", [], "F")]}
+    creator = _make_creator(parameter_map=parameter_map)
+
+    names, new_units = creator._select_parameters({"Capacitance": "100nF", "NewParam": "42"})
+
+    assert names == ["Capacitance", "NewParam"]
+    assert "NewParam" in new_units
+    assert new_units["NewParam"] == "V"
+    assert "Capacitance" not in new_units  # existing — no units prompt
+
+    call_kwargs = mock_select_multiple.call_args[1]
+    ticked = call_kwargs.get("ticked_indices", [])
+    assert 0 in ticked   # Capacitance pre-ticked
+    assert 1 not in ticked  # NewParam not pre-ticked
+
+@patch("inventree_part_import.categories.prompt_input", return_value="")
+@patch("inventree_part_import.categories.select_multiple", return_value=[])
+def test_select_parameters_empty_selection(mock_select_multiple, mock_input):
+    creator = _make_creator()
+    names, new_units = creator._select_parameters({"Voltage": "50V"})
+    assert names == []
+    assert new_units == {}
