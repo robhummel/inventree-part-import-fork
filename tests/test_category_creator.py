@@ -1,5 +1,7 @@
+from unittest.mock import MagicMock, patch
 from click.testing import CliRunner
 from inventree_part_import.cli import inventree_part_import
+from inventree_part_import.part_importer import PartImporter
 
 
 def test_twice_add_is_valid_interactive_choice():
@@ -8,10 +10,6 @@ def test_twice_add_is_valid_interactive_choice():
     assert "twice-add" in result.output
     assert "allows creating missing categories" in result.output
     assert "parameters from DigiKey data" in result.output
-
-
-from unittest.mock import MagicMock, patch
-from inventree_part_import.part_importer import PartImporter
 
 def test_part_importer_stores_allow_category_creation():
     api = MagicMock()

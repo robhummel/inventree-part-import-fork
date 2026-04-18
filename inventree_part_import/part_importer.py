@@ -4,7 +4,7 @@ import traceback
 from enum import Enum
 from multiprocessing.pool import AsyncResult, ThreadPool
 from string import Formatter
-from typing import TYPE_CHECKING, Any, Mapping, Self, Sequence, cast
+from typing import Any, Mapping, Self, Sequence, cast
 
 from cutie import select
 from error_helper import BOLD, BOLD_END, error, hint, info, prompt, prompt_input, success, warning
@@ -16,7 +16,7 @@ from requests.compat import quote
 from requests.exceptions import HTTPError
 from thefuzz import fuzz
 
-from .categories import Category, setup_categories_and_parameters
+from .categories import Category, CategoryCreator, setup_categories_and_parameters
 from .config import CATEGORIES_CONFIG, CONFIG, get_config, get_pre_creation_hooks
 from .exceptions import InvenTreeObjectCreationError
 from .inventree_helpers import (
@@ -31,9 +31,6 @@ from .inventree_helpers import (
 )
 from .suppliers import search
 from .suppliers.base import ApiPart
-
-if TYPE_CHECKING:
-    from .categories import CategoryCreator
 
 
 class ImportResult(Enum):
@@ -71,7 +68,16 @@ class PartImporter:
         }
         self.categories = set(self.category_map.values())
 
-        self.category_creator: "CategoryCreator | None" = None
+        self.category_creator: CategoryCreator | None = (
+            CategoryCreator(
+                inventree_api,
+                self.category_map,
+                self.parameter_map,
+                self.parameter_templates,
+            )
+            if allow_category_creation
+            else None
+        )
 
     def import_part(
         self,
