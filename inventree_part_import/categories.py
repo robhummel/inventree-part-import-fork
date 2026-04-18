@@ -612,15 +612,56 @@ class CategoryCreator:
     def _write_configs(
         self, path: list[str], param_names: list[str], new_param_units: dict[str, str]
     ) -> None:
-        raise NotImplementedError
+        with update_config_file(CATEGORIES_CONFIG) as categories_config:
+            node: dict[str, Any] = categories_config
+            for segment in path[:-1]:
+                if node.get(segment) is None:
+                    node[segment] = {}
+                node = node[segment]
+            leaf: dict[str, Any] = {}
+            if param_names:
+                leaf["_parameters"] = param_names
+            node[path[-1]] = leaf if leaf else None
+
+        if new_param_units:
+            with update_config_file(PARAMETERS_CONFIG) as parameters_config:
+                for name, units in new_param_units.items():
+                    entry: dict[str, Any] = {}
+                    if units:
+                        entry["_unit"] = units
+                    parameters_config[name] = entry if entry else None
 
     def _create_parameter_templates(self, new_param_units: dict[str, str]) -> None:
-        raise NotImplementedError
+        for name, units in new_param_units.items():
+            info(f"creating parameter template '{name}' ...")
+            template = ParameterTemplate.create(
+                self.api,
+                {"name": name, "description": name, "units": units},
+            )
+            if template is None:
+                raise InvenTreeObjectCreationError(ParameterTemplate)
+            self.parameter_templates[name] = template
 
     def _link_parameters_to_category(
         self, part_category: PartCategory, selected_param_names: list[str]
     ) -> None:
-        raise NotImplementedError
+        for name in selected_param_names:
+            if template := self.parameter_templates.get(name):
+                info(f"linking parameter '{name}' to '{part_category.pathstring}' ...")
+                link = PartCategoryParameterTemplate.create(
+                    self.api,
+                    {"category": part_category.pk, "template": template.pk},
+                )
+                if link is None:
+                    raise InvenTreeObjectCreationError(PartCategoryParameterTemplate)
 
     def _update_maps(self, category: Category, new_param_units: dict[str, str]) -> None:
-        raise NotImplementedError
+        for alias in (*category.aliases, category.name):
+            self.category_map[alias.lower()] = category
+
+        for name, units in new_param_units.items():
+            parameter = Parameter(name=name, description=name, aliases=[], units=units)
+            if existing := self.parameter_map.get(name.lower()):
+                existing.append(parameter)
+            else:
+                self.parameter_map[name.lower()] = [parameter]
