@@ -339,17 +339,16 @@ class PartImporter:
         create_option = category_creator is not None and api_part is not None
         choices = [
             *(" / ".join(category.path) for category in category_matches[:N_MATCHES]),
+            f"{BOLD}Enter Manually ...{BOLD_END}",
             *(
                 [f"{BOLD}Create New Category ...{BOLD_END}"]
                 if create_option
                 else []
             ),
-            f"{BOLD}Enter Manually ...{BOLD_END}",
             f"{BOLD}Skip ...{BOLD_END}",
         ]
-        CREATE_IDX = N_MATCHES if create_option else -1
-        MANUAL_IDX = N_MATCHES + (1 if create_option else 0)
-        SKIP_IDX = MANUAL_IDX + 1
+        CREATE_IDX = N_MATCHES + 1 if create_option else -1
+        SKIP_IDX = N_MATCHES + 1 + (1 if create_option else 0)
         while True:
             index = select(choices, deselected_prefix="  ", selected_prefix="> ")
             if index == SKIP_IDX:

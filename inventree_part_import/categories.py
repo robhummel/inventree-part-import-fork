@@ -527,7 +527,7 @@ class CategoryCreator:
             n = max(1, min(int(raw or "1"), len(category_path) - 1))
             return list(category_path[:-n])
         # index == 2: rename
-        renamed = []
+        renamed: list[str] = []
         for segment in category_path:
             new_name = prompt_input(f"name for '{segment}' (blank to keep)") or segment
             renamed.append(new_name)
