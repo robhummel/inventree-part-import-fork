@@ -210,3 +210,49 @@ def test_update_maps_adds_category_and_parameters():
     assert "voltage" in parameter_map
     assert parameter_map["voltage"][0].name == "Voltage"
     assert parameter_map["voltage"][0].units == "V"
+
+from inventree_part_import.suppliers.base import ApiPart
+
+def _make_api_part():
+    return ApiPart(
+        description="Test part",
+        image_url=None,
+        datasheet_url=None,
+        supplier_link="https://digikey.com/test",
+        SKU="TEST-ND",
+        manufacturer="TestMfr",
+        manufacturer_link="",
+        MPN="TEST123",
+        quantity_available=100,
+        packaging="Tape & Reel",
+        category_path=["Semiconductors", "Transistors", "BJT"],
+        parameters={"Voltage": "50V"},
+        price_breaks={1: 0.10},
+        currency="USD",
+    )
+
+@patch("inventree_part_import.part_importer.get_config", return_value={"interactive_category_matches": 5})
+@patch("inventree_part_import.part_importer.select", return_value=1)
+def test_select_category_delegates_to_category_creator(mock_select, mock_get_config):
+    api = MagicMock()
+    api.api_version = 999
+
+    with patch("inventree_part_import.part_importer.setup_categories_and_parameters", return_value=({}, {})), \
+         patch("inventree_part_import.part_importer.get_parameter_templates", return_value={}), \
+         patch("inventree_part_import.part_importer.get_pre_creation_hooks"):
+        importer = PartImporter(api, allow_category_creation=True)
+
+    mock_creator = MagicMock(spec=CategoryCreator)
+    stub = CategoryStub("BJT", ["Semiconductors", "BJT"], "BJT", False, False, [], [])
+    mock_created_cat = Category.from_stub(stub, MagicMock(pk=1))
+    mock_creator.create_from_api_part.return_value = mock_created_cat
+
+    api_part = _make_api_part()
+    result = importer.select_category(
+        api_part.category_path,
+        api_part=api_part,
+        category_creator=mock_creator,
+    )
+
+    mock_creator.create_from_api_part.assert_called_once_with(api_part)
+    assert result is mock_created_cat
