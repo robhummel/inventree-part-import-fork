@@ -1,12 +1,18 @@
+from __future__ import annotations
+
 import sys
 from dataclasses import asdict, dataclass
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
-from cutie import prompt_yes_or_no
-from error_helper import hint, info, success, warning
+from cutie import prompt_yes_or_no, select, select_multiple
+from error_helper import BOLD, BOLD_END, hint, info, prompt, prompt_input, success, warning
 from inventree.api import InvenTreeAPI
 from inventree.base import ParameterTemplate
 from inventree.part import PartCategory, PartCategoryParameterTemplate
+from thefuzz import fuzz
+
+if TYPE_CHECKING:
+    from .suppliers.base import ApiPart
 
 from inventree_part_import.exceptions import InvenTreeObjectCreationError
 
@@ -460,3 +466,93 @@ def setup_config_from_inventree(inventree_api: InvenTreeAPI):
         del root_category["parent"]
 
     return category_tree, parameters
+
+
+class CategoryCreator:
+    def __init__(
+        self,
+        inventree_api: InvenTreeAPI,
+        category_map: dict[str, Category],
+        parameter_map: dict[str, list[Parameter]],
+        parameter_templates: dict[str, ParameterTemplate],
+    ):
+        self.api = inventree_api
+        self.category_map = category_map
+        self.parameter_map = parameter_map
+        self.parameter_templates = parameter_templates
+
+    def create_from_api_part(self, api_part: ApiPart) -> Category | None:
+        confirmed_path = self._edit_path(api_part.category_path)
+        if confirmed_path is None:
+            return None
+
+        part_category = self._create_inventree_categories(confirmed_path)
+        if part_category is None:
+            return None
+
+        selected_param_names, new_param_units = self._select_parameters(api_part.parameters)
+        self._write_configs(confirmed_path, selected_param_names, new_param_units)
+        self._create_parameter_templates(new_param_units)
+        self._link_parameters_to_category(part_category, selected_param_names)
+
+        category_stub = CategoryStub(
+            name=confirmed_path[-1],
+            path=confirmed_path,
+            description=confirmed_path[-1],
+            ignore=False,
+            structural=False,
+            aliases=[],
+            parameters=selected_param_names,
+        )
+        category = Category.from_stub(category_stub, part_category)
+        self._update_maps(category, new_param_units)
+        return category
+
+    def _edit_path(self, category_path: list[str]) -> list[str] | None:
+        info(f"DigiKey category path: {' / '.join(category_path)}", end="\n")
+        prompt("select action for category path")
+        choices = [
+            "Confirm as-is",
+            "Truncate (drop trailing segments)",
+            "Rename segments",
+            f"{BOLD}Skip ...{BOLD_END}",
+        ]
+        index = select(choices, deselected_prefix="  ", selected_prefix="> ")
+        if index == 3:
+            return None
+        if index == 0:
+            return list(category_path)
+        if index == 1:
+            raw = prompt_input(f"segments to drop (1-{len(category_path) - 1})")
+            n = max(1, min(int(raw or "1"), len(category_path) - 1))
+            return list(category_path[:-n])
+        # index == 2: rename
+        renamed = []
+        for segment in category_path:
+            new_name = prompt_input(f"name for '{segment}' (blank to keep)") or segment
+            renamed.append(new_name)
+        return renamed
+
+    def _create_inventree_categories(self, path: list[str]) -> PartCategory | None:
+        raise NotImplementedError
+
+    def _select_parameters(
+        self, api_parameters: dict[str, str]
+    ) -> tuple[list[str], dict[str, str]]:
+        raise NotImplementedError
+
+    def _write_configs(
+        self, path: list[str], param_names: list[str], new_param_units: dict[str, str]
+    ) -> None:
+        raise NotImplementedError
+
+    def _create_parameter_templates(self, new_param_units: dict[str, str]) -> None:
+        raise NotImplementedError
+
+    def _link_parameters_to_category(
+        self, part_category: PartCategory, selected_param_names: list[str]
+    ) -> None:
+        raise NotImplementedError
+
+    def _update_maps(self, category: Category, new_param_units: dict[str, str]) -> None:
+        raise NotImplementedError

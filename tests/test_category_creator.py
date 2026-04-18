@@ -22,3 +22,40 @@ def test_part_importer_stores_allow_category_creation():
 
     assert importer.allow_category_creation is True
     assert importer.category_creator is not None
+
+from inventree_part_import.categories import CategoryCreator, Category, Parameter
+
+def _make_creator(category_map=None, parameter_map=None, parameter_templates=None):
+    api = MagicMock()
+    return CategoryCreator(
+        api,
+        category_map if category_map is not None else {},
+        parameter_map if parameter_map is not None else {},
+        parameter_templates if parameter_templates is not None else {},
+    )
+
+@patch("inventree_part_import.categories.select", return_value=0)
+def test_edit_path_confirm(mock_select):
+    creator = _make_creator()
+    result = creator._edit_path(["Semiconductors", "Transistors", "BJT"])
+    assert result == ["Semiconductors", "Transistors", "BJT"]
+
+@patch("inventree_part_import.categories.prompt_input", return_value="1")
+@patch("inventree_part_import.categories.select", return_value=1)
+def test_edit_path_truncate_by_one(mock_select, mock_input):
+    creator = _make_creator()
+    result = creator._edit_path(["Semiconductors", "Transistors", "BJT"])
+    assert result == ["Semiconductors", "Transistors"]
+
+@patch("inventree_part_import.categories.prompt_input", side_effect=["", "FETs", ""])
+@patch("inventree_part_import.categories.select", return_value=2)
+def test_edit_path_rename_middle_segment(mock_select, mock_input):
+    creator = _make_creator()
+    result = creator._edit_path(["Semiconductors", "Transistors", "BJT"])
+    assert result == ["Semiconductors", "FETs", "BJT"]
+
+@patch("inventree_part_import.categories.select", return_value=3)
+def test_edit_path_skip_returns_none(mock_select):
+    creator = _make_creator()
+    result = creator._edit_path(["Semiconductors", "Transistors"])
+    assert result is None
