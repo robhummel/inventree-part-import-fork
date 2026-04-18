@@ -166,6 +166,7 @@ def test_write_configs_empty_params(tmp_path):
 
     cats = yaml.safe_load((tmp_path / CATEGORIES_CONFIG).read_text())
     assert "NewCategory" in cats
+    assert cats["NewCategory"] is None
 
 @patch("inventree_part_import.categories.ParameterTemplate.create")
 def test_create_parameter_templates(mock_create):
