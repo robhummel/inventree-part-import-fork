@@ -59,3 +59,44 @@ def test_edit_path_skip_returns_none(mock_select):
     creator = _make_creator()
     result = creator._edit_path(["Semiconductors", "Transistors"])
     assert result is None
+
+@patch("inventree_part_import.categories.PartCategory.list", return_value=[])
+@patch("inventree_part_import.categories.PartCategory.create")
+def test_create_inventree_categories_all_new(mock_create, mock_list):
+    parent = MagicMock(pk=1, parent=None)
+    child = MagicMock(pk=2, parent=1)
+    leaf = MagicMock(pk=3, parent=2)
+    mock_create.side_effect = [parent, child, leaf]
+
+    creator = _make_creator()
+    result = creator._create_inventree_categories(["A", "B", "C"])
+
+    assert result is leaf
+    assert mock_create.call_count == 3
+    mock_create.assert_any_call(
+        creator.api, {"name": "A", "description": "A", "structural": False, "parent": None}
+    )
+    mock_create.assert_any_call(
+        creator.api, {"name": "B", "description": "B", "structural": False, "parent": 1}
+    )
+    mock_create.assert_any_call(
+        creator.api, {"name": "C", "description": "C", "structural": False, "parent": 2}
+    )
+
+@patch("inventree_part_import.categories.PartCategory.list")
+@patch("inventree_part_import.categories.PartCategory.create")
+def test_create_inventree_categories_skips_existing(mock_create, mock_list):
+    existing_root = MagicMock(pk=10, parent=None)
+    existing_root.name = "A"
+    mock_list.return_value = [existing_root]
+    leaf = MagicMock(pk=11, parent=10)
+    mock_create.return_value = leaf
+
+    creator = _make_creator()
+    result = creator._create_inventree_categories(["A", "B"])
+
+    assert result is leaf
+    assert mock_create.call_count == 1
+    mock_create.assert_called_once_with(
+        creator.api, {"name": "B", "description": "B", "structural": False, "parent": 10}
+    )

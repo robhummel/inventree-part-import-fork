@@ -534,7 +534,38 @@ class CategoryCreator:
         return renamed
 
     def _create_inventree_categories(self, path: list[str]) -> PartCategory | None:
-        raise NotImplementedError
+        by_pk: dict[Any, PartCategory] = {cat.pk: cat for cat in PartCategory.list(self.api)}
+        existing: dict[tuple[str, ...], PartCategory] = {}
+        for cat in by_pk.values():
+            segments: list[str] = [cat.name]
+            parent = cat
+            while parent := by_pk.get(parent.parent):
+                segments.insert(0, parent.name)
+            existing[tuple(segments)] = cat
+
+        parent_pk: int | None = None
+        part_category: PartCategory | None = None
+        for i in range(1, len(path) + 1):
+            segment_path = tuple(path[:i])
+            if cat := existing.get(segment_path):
+                parent_pk = cast(int, cat.pk)
+                part_category = cat
+                continue
+            info(f"creating category '{'/'.join(segment_path)}' ...")
+            part_category = PartCategory.create(
+                self.api,
+                {
+                    "name": path[i - 1],
+                    "description": path[i - 1],
+                    "structural": False,
+                    "parent": parent_pk,
+                },
+            )
+            if part_category is None:
+                raise InvenTreeObjectCreationError(PartCategory)
+            parent_pk = cast(int, part_category.pk)
+
+        return part_category
 
     def _select_parameters(
         self, api_parameters: dict[str, str]
