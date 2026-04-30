@@ -1,0 +1,2662 @@
+{
+	"info": {
+		"_postman_id": "e56f68f6-2567-4625-ac73-e9338bb942b0",
+		"name": "External API Documentation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Log in",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"UserName\":\"{{username}}\",\n    \"Password\":\"{{password}}\"\n}"
+				},
+				"url": {
+					"raw": "https://api.mcmaster.com/v1/login",
+					"host": [
+						"https://api.mcmaster.com"
+					],
+					"path": [
+						"v1",
+						"login"
+					]
+				},
+				"description": "This request logs in users with valid credentials and certificates to return an authorization token."
+			},
+			"response": [
+				{
+					"name": "Log in -- Failure",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"UserName\":\"{{username}}s\",\n    \"Password\":\"{{password}}\"\n}"
+						},
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/login",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"status": "Unauthorized",
+					"code": 401,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src https: data: blob: wss: interactions salesworkstation passwordvault trkrdev 'unsafe-inline' 'unsafe-eval'; report-uri /ContentSecurityPolicy.aspx"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 22 Jul 2019 22:22:56 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "100"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 401,\n    \"ErrorMessage\": \"LOGIN_FAILED\",\n    \"ErrorDescription\": \"Login failed.\"\n}"
+				},
+				{
+					"name": "Log in -- Unexpected failure",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"UserName\":\"{{username}}\",\n    \"Password\":\"{{password}}\"\n}"
+						},
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/login",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"status": "Internal Server Error",
+					"code": 500,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src 'self' *.mcmaster.com https: http: blob: wss: 'unsafe-inline'; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 24 Jul 2019 16:22:19 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "112"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 500,\n    \"ErrorMessage\": \"INTERNAL_SERVER_ERROR\",\n    \"ErrorDescription\": \"An internal server error occurred.\"\n}"
+				},
+				{
+					"name": "Log in -- Too many attempts",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"UserName\":\"{{username}}\",\n    \"Password\":\"{{password}}11111111111111111\"\n}"
+						},
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/login",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"status": "Unauthorized",
+					"code": 401,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src *.mcmaster.com blob:; connect-src *.mcmaster.com *.boltdns.net csi.gstatic.com translate.google.apis.com wss:; font-src *.mcmaster.com hello.myfonts.net fonts.gstatic.com data:; frame-src *.mcmaster.com www.youtube.com imasdk.googleapis.com data:; img-src *.mcmaster.com *.boltdns.net android-webview-video-poster www.gstatic.com data:; media-src *.mcmaster.com blob:; object-src *.mcmaster.com blob:; script-src *.mcmaster.com 'unsafe-inline' hello.myfonts.net translate.google.com translate.google.apis.com interactions salesworkstation trkrdev; style-src *.mcmaster.com 'unsafe-inline' fonts.googleapis.com translate.google.apis.com interactions salesworkstation trkrdev; worker-src *.mcmaster.com blob:; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Jul 2019 14:34:59 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "100"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 401,\n    \"ErrorMessage\": \"LOGIN_FAILED\",\n    \"ErrorDescription\": \"Too many failed login attempts.\"\n}"
+				},
+				{
+					"name": "Log in -- Incorrect username or password",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"UserName\":\"{{username}}\",\n    \"Password\":\"{{password}}11111111111111111\"\n}"
+						},
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/login",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"status": "Unauthorized",
+					"code": 401,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src *.mcmaster.com blob:; connect-src *.mcmaster.com *.boltdns.net csi.gstatic.com translate.google.apis.com wss:; font-src *.mcmaster.com hello.myfonts.net fonts.gstatic.com data:; frame-src *.mcmaster.com www.youtube.com imasdk.googleapis.com data:; img-src *.mcmaster.com *.boltdns.net android-webview-video-poster www.gstatic.com data:; media-src *.mcmaster.com blob:; object-src *.mcmaster.com blob:; script-src *.mcmaster.com 'unsafe-inline' hello.myfonts.net translate.google.com translate.google.apis.com interactions salesworkstation trkrdev; style-src *.mcmaster.com 'unsafe-inline' fonts.googleapis.com translate.google.apis.com interactions salesworkstation trkrdev; worker-src *.mcmaster.com blob:; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Jul 2019 14:34:59 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "100"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 401,\n    \"ErrorMessage\": \"LOGIN_FAILED\",\n    \"ErrorDescription\": \"Incorrect username or password.\"\n}"
+				},
+				{
+					"name": "Log in -- Incorrect/unauthorized account",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"UserName\":\"{{username}}\",\n    \"Password\":\"{{password}}\"\n}"
+						},
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/login",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"status": "Unauthorized",
+					"code": 401,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src *.mcmaster.com blob:; connect-src *.mcmaster.com *.boltdns.net csi.gstatic.com translate.google.apis.com wss:; font-src *.mcmaster.com hello.myfonts.net fonts.gstatic.com data:; frame-src *.mcmaster.com www.youtube.com imasdk.googleapis.com data:; img-src *.mcmaster.com *.boltdns.net android-webview-video-poster www.gstatic.com data:; media-src *.mcmaster.com blob:; object-src *.mcmaster.com blob:; script-src *.mcmaster.com 'unsafe-inline' hello.myfonts.net translate.google.com translate.google.apis.com interactions salesworkstation trkrdev; style-src *.mcmaster.com 'unsafe-inline' fonts.googleapis.com translate.google.apis.com interactions salesworkstation trkrdev; worker-src *.mcmaster.com blob:; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Jul 2019 14:41:30 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "129"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 401,\n    \"ErrorMessage\": \"LOGIN_FAILED\",\n    \"ErrorDescription\": \"This account ID is not authorized for the API: {{account ID}}\"\n}"
+				},
+				{
+					"name": "Log in -- Success",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"UserName\":\"{{username}}\",\n    \"Password\":\"{{password}}\"\n}"
+						},
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/login",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src https: data: blob: wss: interactions salesworkstation passwordvault trkrdev 'unsafe-inline' 'unsafe-eval'; report-uri /ContentSecurityPolicy.aspx"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 22 Jul 2019 22:08:50 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "118"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"AuthToken\": \"VXVPTHM746877516169vUkVXTFdvYTV0U1I2VTZidnNYVzc3OCtBPT0=\",\n    \"ExpirationTS\": \"2019-07-23T22:08:50.6227667Z\"\n}"
+				},
+				{
+					"name": "Log in -- Incorrect request",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/login",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src https: data: blob: wss: interactions salesworkstation passwordvault trkrdev 'unsafe-inline' 'unsafe-eval'; report-uri /ContentSecurityPolicy.aspx"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 23 Jul 2019 15:09:59 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "134"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 400,\n    \"ErrorMessage\": \"BAD_REQUEST\",\n    \"ErrorDescription\": \"Improperly formed request. Please check your POST body for errors.\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Log out",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "https://api.mcmaster.com/v1/logout",
+					"host": [
+						"https://api.mcmaster.com"
+					],
+					"path": [
+						"v1",
+						"logout"
+					]
+				},
+				"description": "Log out the user by expiring the authorization token"
+			},
+			"response": [
+				{
+					"name": "Log out -- Unexpected",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/logout",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"logout"
+							]
+						}
+					},
+					"status": "Internal Server Error",
+					"code": 500,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src *.mcmaster.com blob:; connect-src *.mcmaster.com *.boltdns.net csi.gstatic.com translate.google.apis.com wss:; font-src *.mcmaster.com hello.myfonts.net fonts.gstatic.com data:; frame-src *.mcmaster.com www.youtube.com imasdk.googleapis.com data:; img-src *.mcmaster.com *.boltdns.net android-webview-video-poster www.gstatic.com data:; media-src *.mcmaster.com blob:; object-src *.mcmaster.com blob:; script-src *.mcmaster.com 'unsafe-inline' hello.myfonts.net translate.google.com translate.google.apis.com interactions salesworkstation trkrdev; style-src *.mcmaster.com 'unsafe-inline' fonts.googleapis.com translate.google.apis.com interactions salesworkstation trkrdev; worker-src *.mcmaster.com blob:; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 23 Jul 2019 20:30:41 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "112"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 500,\n    \"ErrorMessage\": \"INTERNAL_SERVER_ERROR\",\n    \"ErrorDescription\": \"An internal server error occurred.\"\n}"
+				},
+				{
+					"name": "Log out -- Expired auth token",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/logout",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"logout"
+							]
+						}
+					},
+					"status": "Forbidden",
+					"code": 403,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src *.mcmaster.com blob:; connect-src *.mcmaster.com *.boltdns.net csi.gstatic.com translate.google.apis.com wss:; font-src *.mcmaster.com hello.myfonts.net fonts.gstatic.com data:; frame-src *.mcmaster.com www.youtube.com imasdk.googleapis.com data:; img-src *.mcmaster.com *.boltdns.net android-webview-video-poster www.gstatic.com data:; media-src *.mcmaster.com blob:; object-src *.mcmaster.com blob:; script-src *.mcmaster.com 'unsafe-inline' hello.myfonts.net translate.google.com translate.google.apis.com interactions salesworkstation trkrdev; style-src *.mcmaster.com 'unsafe-inline' fonts.googleapis.com translate.google.apis.com interactions salesworkstation trkrdev; worker-src *.mcmaster.com blob:; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 23 Jul 2019 20:45:20 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "168"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 403,\n    \"ErrorMessage\": \"EXPIRED_AUTHORIZATION_TOKEN\",\n    \"ErrorDescription\": \"Invalid authorization token: {{authToken}}. Please log in again to create a new one.\"\n}"
+				},
+				{
+					"name": "Log out -- Success",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/logout",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"logout"
+							]
+						}
+					},
+					"status": "No Content",
+					"code": 204,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src *.mcmaster.com blob:; connect-src *.mcmaster.com *.boltdns.net csi.gstatic.com translate.google.apis.com wss:; font-src *.mcmaster.com hello.myfonts.net fonts.gstatic.com data:; frame-src *.mcmaster.com www.youtube.com imasdk.googleapis.com data:; img-src *.mcmaster.com *.boltdns.net android-webview-video-poster www.gstatic.com data:; media-src *.mcmaster.com blob:; object-src *.mcmaster.com blob:; script-src *.mcmaster.com 'unsafe-inline' hello.myfonts.net translate.google.com translate.google.apis.com interactions salesworkstation trkrdev; style-src *.mcmaster.com 'unsafe-inline' fonts.googleapis.com translate.google.apis.com interactions salesworkstation trkrdev; worker-src *.mcmaster.com blob:; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 23 Jul 2019 20:32:33 GMT"
+						}
+					],
+					"cookie": [],
+					"body": null
+				}
+			]
+		},
+		{
+			"name": "Add product",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"URL\":\"https://mcmaster.com/{{partNumber}}\"}"
+				},
+				"url": {
+					"raw": "https://api.mcmaster.com/v1/products",
+					"host": [
+						"https://api.mcmaster.com"
+					],
+					"path": [
+						"v1",
+						"products"
+					]
+				},
+				"description": "Adds a product to the user's list of subscribed products and returns the information for the product"
+			},
+			"response": [
+				{
+					"name": "Add product -- Bad auth token",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"URL\":\"https://wwwdev.mcmaster.com/{{partNumber}}\"}"
+						},
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/products",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"products"
+							]
+						}
+					},
+					"status": "Forbidden",
+					"code": 403,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src 'self' *.mcmaster.com https: http: blob: wss: 'unsafe-inline'; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Jul 2019 21:42:45 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "207"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 403,\n    \"ErrorMessage\": \"EXPIRED_AUTHORIZATION_TOKEN\",\n    \"ErrorDescription\": \"Invalid authorization token: {{authToken}}. Please log in again to create a new one.\"\n}"
+				},
+				{
+					"name": "Add product -- Bad request",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"URL\":\"https://wwwdev.mcmaster.com/{{partNumber}}\"}"
+						},
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/products",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"products"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src *.mcmaster.com blob:; connect-src *.mcmaster.com *.boltdns.net csi.gstatic.com translate.google.apis.com wss:; font-src *.mcmaster.com hello.myfonts.net fonts.gstatic.com data:; frame-src *.mcmaster.com www.youtube.com imasdk.googleapis.com data:; img-src *.mcmaster.com *.boltdns.net android-webview-video-poster www.gstatic.com data:; media-src *.mcmaster.com blob:; object-src *.mcmaster.com blob:; script-src *.mcmaster.com 'unsafe-inline' hello.myfonts.net translate.google.com translate.google.apis.com interactions salesworkstation trkrdev; style-src *.mcmaster.com 'unsafe-inline' fonts.googleapis.com translate.google.apis.com interactions salesworkstation trkrdev; worker-src *.mcmaster.com blob:; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 23 Jul 2019 20:34:51 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "103"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 400,\n    \"ErrorMessage\": \"BAD_REQUEST\",\n    \"ErrorDescription\": \"Invalid part number: {{PARTNUMBER}}\"\n}"
+				},
+				{
+					"name": "Add product -- New subscription",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"URL\":\"https://wwwdev.mcmaster.com/{{partNumber}}\"}"
+						},
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/products",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"products"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src *.mcmaster.com blob:; connect-src *.mcmaster.com *.boltdns.net csi.gstatic.com translate.google.apis.com wss:; font-src *.mcmaster.com hello.myfonts.net fonts.gstatic.com data:; frame-src *.mcmaster.com www.youtube.com imasdk.googleapis.com data:; img-src *.mcmaster.com *.boltdns.net android-webview-video-poster www.gstatic.com data:; media-src *.mcmaster.com blob:; object-src *.mcmaster.com blob:; script-src *.mcmaster.com 'unsafe-inline' hello.myfonts.net translate.google.com translate.google.apis.com interactions salesworkstation trkrdev; style-src *.mcmaster.com 'unsafe-inline' fonts.googleapis.com translate.google.apis.com interactions salesworkstation trkrdev; worker-src *.mcmaster.com blob:; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 23 Jul 2019 20:36:03 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "326"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"PartNumber\": \"4936K451\",\n    \"ProductStatus\": \"Active\",\n    \"FamilyDescription\": \"Compact Extreme-Pressure Steel Pipe Fitting\",\n    \"DetailDescription\": \"Adapter, 1/2 NPT Female, M20 x 1.5mm Male Thread\",\n    \"Specifications\": [\n        {\n            \"Attribute\": \"Shape\",\n            \"Values\": [\n                \"Straight\"\n            ]\n        },\n        ...\n        {\n            \"Attribute\": \"For Use With\",\n            \"Values\": [\n                \"Water\",\n                \"Air\",\n                \"Hydraulic Fluid\",\n                \"Oil\"\n            ]\n        }\n    ],\n    \"Links\": [\n        {\n            \"Key\": \"Price\",\n            \"Value\": \"/v1/products/4936K451/price\"\n        },\n        {\n            \"Key\": \"Image\",\n            \"Value\": \"/v1/images/contents/gfx/imagecache/493/4936k451p1-c01d-digitall@1x_636616342399401664.png\"\n        },\n        {\n            \"Key\": \"2-D DWG\",\n            \"Value\": \"/v1/cad/library/20180924/4936K451_COMPACT%20EXTREME-PRESSURE%20STEEL%20PIPE%20FITTING.DWG\"\n        },\n        ...\n        {\n            \"Key\": \"3-D STEP\",\n            \"Value\": \"/v1/cad/library/20180924/4936K451_COMPACT%20EXTREME-PRESSURE%20STEEL%20PIPE%20FITTING.STEP\"\n        }\n    ]\n}"
+				},
+				{
+					"name": "Add product -- Already subscribed",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"URL\":\"https://mcmaster.com/{{partNumber}}\"}"
+						},
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/products",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"products"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src 'self' *.mcmaster.com https: http: blob: wss: 'unsafe-inline'; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 26 Jul 2019 19:37:02 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "2471"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"PartNumber\": \"4936K451\",\n    \"ProductStatus\": \"Active\",\n    \"FamilyDescription\": \"Compact Extreme-Pressure Steel Pipe Fitting\",\n    \"DetailDescription\": \"Adapter, 1/2 NPT Female, M20 x 1.5mm Male Thread\",\n    \"Specifications\": [\n        {\n            \"Attribute\": \"Shape\",\n            \"Values\": [\n                \"Straight\"\n            ]\n        },\n        ...\n        {\n            \"Attribute\": \"For Use With\",\n            \"Values\": [\n                \"Water\",\n                \"Air\",\n                \"Hydraulic Fluid\",\n                \"Oil\"\n            ]\n        }\n    ],\n    \"Links\": [\n        {\n            \"Key\": \"Price\",\n            \"Value\": \"/v1/products/4936K451/price\"\n        },\n        {\n            \"Key\": \"Image\",\n            \"Value\": \"/v1/images/contents/gfx/imagecache/493/4936k451p1-c01d-digitall@1x_636616342399401664.png\"\n        },\n        {\n            \"Key\": \"2-D DWG\",\n            \"Value\": \"/v1/cad/library/20180924/4936K451_COMPACT%20EXTREME-PRESSURE%20STEEL%20PIPE%20FITTING.DWG\"\n        },\n        ...\n        {\n            \"Key\": \"3-D STEP\",\n            \"Value\": \"/v1/cad/library/20180924/4936K451_COMPACT%20EXTREME-PRESSURE%20STEEL%20PIPE%20FITTING.STEP\"\n        }\n    ]\n}"
+				}
+			]
+		},
+		{
+			"name": "Remove product",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a250d13d-2cc0-4e24-9544-bf08f535fa01",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"URL\":\"https://mcmaster.com/{{partNumber}}\"}"
+				},
+				"url": {
+					"raw": "https://api.mcmaster.com/v1/products",
+					"host": [
+						"https://api.mcmaster.com"
+					],
+					"path": [
+						"v1",
+						"products"
+					]
+				},
+				"description": "Removes a product from a user's list of subscribed products"
+			},
+			"response": [
+				{
+					"name": "Remove product -- Success",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"URL\":\"https://wwwdev.mcmaster.com/{{partNumber}}\"}"
+						},
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/products",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"products"
+							]
+						}
+					},
+					"status": "No Content",
+					"code": 204,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src *.mcmaster.com blob:; connect-src *.mcmaster.com *.boltdns.net csi.gstatic.com translate.google.apis.com wss:; font-src *.mcmaster.com hello.myfonts.net fonts.gstatic.com data:; frame-src *.mcmaster.com www.youtube.com imasdk.googleapis.com data:; img-src *.mcmaster.com *.boltdns.net android-webview-video-poster www.gstatic.com data:; media-src *.mcmaster.com blob:; object-src *.mcmaster.com blob:; script-src *.mcmaster.com 'unsafe-inline' hello.myfonts.net translate.google.com translate.google.apis.com interactions salesworkstation trkrdev; style-src *.mcmaster.com 'unsafe-inline' fonts.googleapis.com translate.google.apis.com interactions salesworkstation trkrdev; worker-src *.mcmaster.com blob:; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 23 Jul 2019 20:54:59 GMT"
+						}
+					],
+					"cookie": [],
+					"body": null
+				},
+				{
+					"name": "Remove product -- Not found",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"URL\":\"https://wwwdev.mcmaster.com/{{partNumber}}\"}"
+						},
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/products",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"products"
+							]
+						}
+					},
+					"status": "Not Found, Not subscribed to part number: {{partNumber}}. No subscription to remove",
+					"code": 404,
+					"_postman_previewlanguage": "text",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src *.mcmaster.com blob:; connect-src *.mcmaster.com *.boltdns.net csi.gstatic.com translate.google.apis.com wss:; font-src *.mcmaster.com hello.myfonts.net fonts.gstatic.com data:; frame-src *.mcmaster.com www.youtube.com imasdk.googleapis.com data:; img-src *.mcmaster.com *.boltdns.net android-webview-video-poster www.gstatic.com data:; media-src *.mcmaster.com blob:; object-src *.mcmaster.com blob:; script-src *.mcmaster.com 'unsafe-inline' hello.myfonts.net translate.google.com translate.google.apis.com interactions salesworkstation trkrdev; style-src *.mcmaster.com 'unsafe-inline' fonts.googleapis.com translate.google.apis.com interactions salesworkstation trkrdev; worker-src *.mcmaster.com blob:; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 23 Jul 2019 20:55:30 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "0"
+						}
+					],
+					"cookie": [],
+					"body": ""
+				},
+				{
+					"name": "Remove product -- Bad request",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/products",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"products"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src *.mcmaster.com blob:; connect-src *.mcmaster.com *.boltdns.net csi.gstatic.com translate.google.apis.com wss:; font-src *.mcmaster.com hello.myfonts.net fonts.gstatic.com data:; frame-src *.mcmaster.com www.youtube.com imasdk.googleapis.com data:; img-src *.mcmaster.com *.boltdns.net android-webview-video-poster www.gstatic.com data:; media-src *.mcmaster.com blob:; object-src *.mcmaster.com blob:; script-src *.mcmaster.com 'unsafe-inline' hello.myfonts.net translate.google.com translate.google.apis.com interactions salesworkstation trkrdev; style-src *.mcmaster.com 'unsafe-inline' fonts.googleapis.com translate.google.apis.com interactions salesworkstation trkrdev; worker-src *.mcmaster.com blob:; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 23 Jul 2019 20:55:57 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "134"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 400,\n    \"ErrorMessage\": \"BAD_REQUEST\",\n    \"ErrorDescription\": \"Improperly formed request. Please check your POST body for errors.\"\n}"
+				},
+				{
+					"name": "Remove product -- Invalid part number",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"URL\":\"https://wwwdev.mcmaster.com/{{partNumber}}\"}"
+						},
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/products",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"products"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src *.mcmaster.com blob:; connect-src *.mcmaster.com *.boltdns.net csi.gstatic.com translate.google.apis.com wss:; font-src *.mcmaster.com hello.myfonts.net fonts.gstatic.com data:; frame-src *.mcmaster.com www.youtube.com imasdk.googleapis.com data:; img-src *.mcmaster.com *.boltdns.net android-webview-video-poster www.gstatic.com data:; media-src *.mcmaster.com blob:; object-src *.mcmaster.com blob:; script-src *.mcmaster.com 'unsafe-inline' hello.myfonts.net translate.google.com translate.google.apis.com interactions salesworkstation trkrdev; style-src *.mcmaster.com 'unsafe-inline' fonts.googleapis.com translate.google.apis.com interactions salesworkstation trkrdev; worker-src *.mcmaster.com blob:; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 23 Jul 2019 20:56:38 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "103"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 400,\n    \"ErrorMessage\": \"BAD_REQUEST\",\n    \"ErrorDescription\": \"Invalid part number: {{PARTNUMBER}}\"\n}"
+				},
+				{
+					"name": "Remove product -- Expired auth token",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"URL\":\"https://wwwdev.mcmaster.com/{{partNumber}}\"}"
+						},
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/products",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"products"
+							]
+						}
+					},
+					"status": "Forbidden",
+					"code": 403,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src *.mcmaster.com blob:; connect-src *.mcmaster.com *.boltdns.net csi.gstatic.com translate.google.apis.com wss:; font-src *.mcmaster.com hello.myfonts.net fonts.gstatic.com data:; frame-src *.mcmaster.com www.youtube.com imasdk.googleapis.com data:; img-src *.mcmaster.com *.boltdns.net android-webview-video-poster www.gstatic.com data:; media-src *.mcmaster.com blob:; object-src *.mcmaster.com blob:; script-src *.mcmaster.com 'unsafe-inline' hello.myfonts.net translate.google.com translate.google.apis.com interactions salesworkstation trkrdev; style-src *.mcmaster.com 'unsafe-inline' fonts.googleapis.com translate.google.apis.com interactions salesworkstation trkrdev; worker-src *.mcmaster.com blob:; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Jul 2019 14:28:35 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "211"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 403,\n    \"ErrorMessage\": \"EXPIRED_AUTHORIZATION_TOKEN\",\n    \"ErrorDescription\": \"Invalid authorization token: {{authToken}}. Please log in again to create a new one.\"\n}"
+				}
+			]
+		},
+		
+		{
+			"name": "Product information",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.mcmaster.com/v1/products/{{partNumber}}",
+					"host": [
+						"https://api.mcmaster.com"
+					],
+					"path": [
+						"v1",
+						"products",
+						"{{partNumber}}"
+					]
+				},
+				"description": "Retrieves product information for a given part number\n<p>Discontinued products will be marked inactive and contain a link to a suggested replacement, if there is one. Any differences between the originally requested and suggested replacement parts will be listed as <i>SuggestedProductDifferences</i>.</p>"
+			},
+			"response": [
+				{
+					"name": "Product information -- Bad auth token",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/products/{{partNumber}}",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"products",
+								"{{partNumber}}"
+							]
+						}
+					},
+					"status": "Forbidden",
+					"code": 403,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src *.mcmaster.com blob:; connect-src *.mcmaster.com *.boltdns.net csi.gstatic.com translate.google.apis.com wss:; font-src *.mcmaster.com hello.myfonts.net fonts.gstatic.com data:; frame-src *.mcmaster.com www.youtube.com imasdk.googleapis.com data:; img-src *.mcmaster.com *.boltdns.net android-webview-video-poster www.gstatic.com data:; media-src *.mcmaster.com blob:; object-src *.mcmaster.com blob:; script-src *.mcmaster.com 'unsafe-inline' hello.myfonts.net translate.google.com translate.google.apis.com interactions salesworkstation trkrdev; style-src *.mcmaster.com 'unsafe-inline' fonts.googleapis.com translate.google.apis.com interactions salesworkstation trkrdev; worker-src *.mcmaster.com blob:; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 24 Jul 2019 16:23:22 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "168"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 403,\n    \"ErrorMessage\": \"EXPIRED_AUTHORIZATION_TOKEN\",\n    \"ErrorDescription\": \"Invalid authorization token: {{authToken}}. Please log in again to create a new one.\"\n}"
+				},
+				{
+					"name": "Product information -- Discontinued",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/products/{{partNumber}}",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"products",
+								"{{partNumber}}"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": null,
+					"cookie": [],
+					"body": "{\n    \"PartNumber\": \"1149A81\",\n    \"ProductStatus\": \"Discontinued\",\n    \"Links\": [\n        {\n            \"Key\": \"SuggestedProduct\",\n            \"Value\": \"https://www.mcmaster.com/15185A41\"\n        }\n    ],\n    \"SuggestedProductDifferences\": [\n        {\n            \"Attribute\": \"Material\",\n            \"DiscontinuedProductValue\": \"Plastic\",\n            \"SuggestedProductValue\": \"Stainless Steel\"\n        },\n        {\n            \"Attribute\": \"Width\",\n            \"DiscontinuedProductValue\": \"1-3/4\\\"\",\n            \"SuggestedProductValue\": \"2\\\"\"\n        }\n    ]\n}"
+				},
+				{
+					"name": "Product information -- Not subscribed",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/products/{{partNumber}}",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"products",
+								"{{partNumber}}"
+							]
+						}
+					},
+					"status": "Forbidden",
+					"code": 403,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src *.mcmaster.com blob:; connect-src *.mcmaster.com *.boltdns.net csi.gstatic.com translate.google.apis.com wss:; font-src *.mcmaster.com hello.myfonts.net fonts.gstatic.com data:; frame-src *.mcmaster.com www.youtube.com imasdk.googleapis.com data:; img-src *.mcmaster.com *.boltdns.net android-webview-video-poster www.gstatic.com data:; media-src *.mcmaster.com blob:; object-src *.mcmaster.com blob:; script-src *.mcmaster.com 'unsafe-inline' hello.myfonts.net translate.google.com translate.google.apis.com interactions salesworkstation trkrdev; style-src *.mcmaster.com 'unsafe-inline' fonts.googleapis.com translate.google.apis.com interactions salesworkstation trkrdev; worker-src *.mcmaster.com blob:; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 23 Jul 2019 21:04:32 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "129"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 403,\n    \"ErrorMessage\": \"NOT_SUBSCRIBED_TO_PRODUCT\",\n    \"ErrorDescription\": \"You are not subscribed to this product: {{partNumber}}\"\n}"
+				},
+				{
+					"name": "Product information -- Success",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/products/{{partNumber}}",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"products",
+								"{{partNumber}}"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip"
+						},
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src *.mcmaster.com blob:; connect-src *.mcmaster.com *.boltdns.net csi.gstatic.com translate.google.apis.com wss:; font-src *.mcmaster.com hello.myfonts.net fonts.gstatic.com data:; frame-src *.mcmaster.com www.youtube.com imasdk.googleapis.com data:; img-src *.mcmaster.com *.boltdns.net android-webview-video-poster www.gstatic.com data:; media-src *.mcmaster.com blob:; object-src *.mcmaster.com blob:; script-src *.mcmaster.com 'unsafe-inline' hello.myfonts.net translate.google.com translate.google.apis.com interactions salesworkstation trkrdev; style-src *.mcmaster.com 'unsafe-inline' fonts.googleapis.com translate.google.apis.com interactions salesworkstation trkrdev; worker-src *.mcmaster.com blob:; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 23 Jul 2019 21:05:14 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "238"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"PartNumber\": \"4936K451\",\n    \"ProductStatus\": \"Active\",\n    \"FamilyDescription\": \"Compact Extreme-Pressure Steel Pipe Fitting\",\n    \"DetailDescription\": \"Adapter, 1/2 NPT Female, M20 x 1.5mm Male Thread\",\n    \"Specifications\": [\n        {\n            \"Attribute\": \"Shape\",\n            \"Values\": [\n                \"Straight\"\n            ]\n        },\n        ...\n        {\n            \"Attribute\": \"For Use With\",\n            \"Values\": [\n                \"Water\",\n                \"Air\",\n                \"Hydraulic Fluid\",\n                \"Oil\"\n            ]\n        }\n    ],\n    \"Links\": [\n        {\n            \"Key\": \"Price\",\n            \"Value\": \"/v1/products/4936K451/price\"\n        },\n        {\n            \"Key\": \"Image\",\n            \"Value\": \"/v1/images/contents/gfx/imagecache/493/4936k451p1-c01d-digitall@1x_636616342399401664.png\"\n        },\n        {\n            \"Key\": \"2-D DWG\",\n            \"Value\": \"/v1/cad/library/20180924/4936K451_COMPACT%20EXTREME-PRESSURE%20STEEL%20PIPE%20FITTING.DWG\"\n        },\n        ...\n        {\n            \"Key\": \"3-D STEP\",\n            \"Value\": \"/v1/cad/library/20180924/4936K451_COMPACT%20EXTREME-PRESSURE%20STEEL%20PIPE%20FITTING.STEP\"\n        }\n    ]\n}"
+				}
+			]
+		},
+		{
+			"name": "Price",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.mcmaster.com/v1/products/{{partNumber}}/price",
+					"host": [
+						"https://api.mcmaster.com"
+					],
+					"path": [
+						"v1",
+						"products",
+						"{{partNumber}}",
+						"price"
+					]
+				},
+				"description": "Retrieves the current price of a certain product"
+			},
+			"response": [
+				{
+					"name": "Price -- Success",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/products/{{partNumber}}/price?",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"products",
+								"{{partNumber}}",
+								"price"
+							],
+							"query": [
+								{
+									"key": "ver",
+									"value": "imagenotfound",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip"
+						},
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src 'self' *.mcmaster.com https: http: blob: wss: 'unsafe-inline'; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Jul 2019 15:42:17 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "91"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"Amount\": 3.46,\n        \"MinimumQuantity\": 1,\n        \"UnitOfMeasure\": \"Each\"\n    }\n]"
+				},
+				{
+					"name": "Price -- Bad auth token",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/products/{{partNumber}}/price?",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"products",
+								"{{partNumber}}",
+								"price"
+							],
+							"query": [
+								{
+									"key": "ver",
+									"value": "imagenotfound",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"status": "Forbidden",
+					"code": 403,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src 'self' *.mcmaster.com https: http: blob: wss: 'unsafe-inline'; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Jul 2019 21:48:31 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "207"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 403,\n    \"ErrorMessage\": \"EXPIRED_AUTHORIZATION_TOKEN\",\n    \"ErrorDescription\": \"Invalid authorization token: {{authToken}}. Please log in again to create a new one.\"\n}"
+				},
+				{
+					"name": "Price -- Not subscribed",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/products/{{partNumber}}/price?",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"products",
+								"{{partNumber}}",
+								"price"
+							],
+							"query": [
+								{
+									"key": "ver",
+									"value": "imagenotfound",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"status": "Forbidden",
+					"code": 403,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src 'self' *.mcmaster.com https: http: blob: wss: 'unsafe-inline'; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Jul 2019 15:44:06 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "130"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 403,\n    \"ErrorMessage\": \"NOT_SUBSCRIBED_TO_PRODUCT\",\n    \"ErrorDescription\": \"You are not subscribed to this product: {{partNumber}}\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Image",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "image/png",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Accept-Encoding",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Accept-Charset",
+						"value": "UTF-8",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://api.mcmaster.com/v1/images/{{imagePath}}",
+					"host": [
+						"https://api.mcmaster.com"
+					],
+					"path": [
+						"v1",
+						"images",
+						"{{imagePath}}"
+					]
+				},
+				"description": "Retrieves an image from a relative path"
+			},
+			"response": [
+				{
+					"name": "Image -- Bad file path",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "image/png",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Accept-Encoding",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Accept-Charset",
+								"value": "UTF-8",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/images/{{imagePath}}?",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"images",
+								"{{imagePath}}"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "imagenotfound",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src 'self' *.mcmaster.com https: http: blob: wss: 'unsafe-inline'; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Jul 2019 15:40:38 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "95"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 400,\n    \"ErrorMessage\": \"BAD_REQUEST\",\n    \"ErrorDescription\": \"Invalid file path requested\"\n}"
+				},
+				{
+					"name": "Image -- Bad auth token",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "image/png",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Accept-Encoding",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Accept-Charset",
+								"value": "UTF-8",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/images/{{imagePath}}?",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"images",
+								"{{imagePath}}"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "imagenotfound",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"status": "Forbidden",
+					"code": 403,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src 'self' *.mcmaster.com https: http: blob: wss: 'unsafe-inline'; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Jul 2019 21:49:49 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "207"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 403,\n    \"ErrorMessage\": \"EXPIRED_AUTHORIZATION_TOKEN\",\n    \"ErrorDescription\": \"Invalid authorization token: {{authToken}}. Please log in again to create a new one.\"\n}"
+				},
+				{
+					"name": "Image -- Success",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "image/png",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Accept-Encoding",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Accept-Charset",
+								"value": "UTF-8",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/images/{{imagePath}}?",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"images",
+								"{{imagePath}}"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "imagenotfound",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": "The requested image file"
+				},
+				{
+					"name": "Image -- Bad file type",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "image/png",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Accept-Encoding",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Accept-Charset",
+								"value": "UTF-8",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/images/{{imagePath}}?",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"images",
+								"{{imagePath}}"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "imagenotfound",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src 'self' *.mcmaster.com https: http: blob: wss: 'unsafe-inline'; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Jul 2019 15:40:14 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "95"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 400,\n    \"ErrorMessage\": \"BAD_REQUEST\",\n    \"ErrorDescription\": \"Invalid file type requested\"\n}"
+				}
+			]
+		},
+		{
+			"name": "CAD",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.mcmaster.com/v1/cad/{{cadPath}}",
+					"host": [
+						"https://api.mcmaster.com"
+					],
+					"path": [
+						"v1",
+						"cad",
+						"{{cadPath}}"
+					]
+				},
+				"description": "Retrieves a CAD file from a relative path"
+			},
+			"response": [
+				{
+					"name": "CAD -- Bad file path",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/cad/y{{cadPath}}",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"cad",
+								"y{{cadPath}}"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src 'self' *.mcmaster.com https: http: blob: wss: 'unsafe-inline'; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Jul 2019 15:36:58 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "95"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 400,\n    \"ErrorMessage\": \"BAD_REQUEST\",\n    \"ErrorDescription\": \"Invalid file path requested\"\n}"
+				},
+				{
+					"name": "CAD -- Success",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/cad/{{cadPath}}",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"cad",
+								"{{cadPath}}"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": "The requested CAD file"
+				},
+				{
+					"name": "CAD -- Bad auth token",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/cad/{{cadPath}}",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"cad",
+								"{{cadPath}}"
+							]
+						}
+					},
+					"status": "Forbidden",
+					"code": 403,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src 'self' *.mcmaster.com https: http: blob: wss: 'unsafe-inline'; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Jul 2019 21:50:26 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "207"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 403,\n    \"ErrorMessage\": \"EXPIRED_AUTHORIZATION_TOKEN\",\n    \"ErrorDescription\": \"Invalid authorization token: {{authToken}}. Please log in again to create a new one.\"\n}"
+				},
+				{
+					"name": "CAD -- Bad file type",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/cad/{{cadPath}}y",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"cad",
+								"{{cadPath}}y"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src 'self' *.mcmaster.com https: http: blob: wss: 'unsafe-inline'; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Jul 2019 15:36:26 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "95"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 400,\n    \"ErrorMessage\": \"BAD_REQUEST\",\n    \"ErrorDescription\": \"Invalid file type requested\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Datasheet",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.mcmaster.com/v1/datasheets/{{dataSheetPath}}",
+					"host": [
+						"https://api.mcmaster.com"
+					],
+					"path": [
+						"v1",
+						"datasheets",
+						"{{dataSheetPath}}"
+					]
+				},
+				"description": "Retrieves a datasheet from a relative path"
+			},
+			"response": [
+				{
+					"name": "Datasheet -- Success",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/datasheets/{{dataSheetPath}}",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"datasheets",
+								"{{dataSheetPath}}"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": "The requested datasheet"
+				},
+				{
+					"name": "Datasheet -- bad file type",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/datasheets/{{dataSheetPath}}s",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"datasheets",
+								"{{dataSheetPath}}s"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src 'self' *.mcmaster.com https: http: blob: wss: 'unsafe-inline'; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Jul 2019 16:32:14 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "95"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 400,\n    \"ErrorMessage\": \"BAD_REQUEST\",\n    \"ErrorDescription\": \"Invalid file type requested\"\n}"
+				},
+				{
+					"name": "Datasheet -- Bad file path",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/datasheets/s{{dataSheetPath}}",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"datasheets",
+								"s{{dataSheetPath}}"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src 'self' *.mcmaster.com https: http: blob: wss: 'unsafe-inline'; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Jul 2019 16:32:36 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "95"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 400,\n    \"ErrorMessage\": \"BAD_REQUEST\",\n    \"ErrorDescription\": \"Invalid file path requested\"\n}"
+				},
+				{
+					"name": "Datasheet -- Bad auth token",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.mcmaster.com/v1/datasheets/{{dataSheetPath}}",
+							"host": [
+								"https://api.mcmaster.com"
+							],
+							"path": [
+								"v1",
+								"datasheets",
+								"{{dataSheetPath}}"
+							]
+						}
+					},
+					"status": "Forbidden",
+					"code": 403,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Cache-Control",
+							"value": "private"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Server",
+							"value": "Microsoft-IIS/10.0"
+						},
+						{
+							"key": "X-AspNet-Version",
+							"value": "4.0.30319"
+						},
+						{
+							"key": "X-Powered-By",
+							"value": "ASP.NET"
+						},
+						{
+							"key": "P3P",
+							"value": "CP=\"CAO DSP CURa ADMa DEVa OUR DELa BUS PHY ONL UNI PUR COM NAV STA\""
+						},
+						{
+							"key": "Content-Security-Policy-Report-Only",
+							"value": "default-src 'self' *.mcmaster.com https: http: blob: wss: 'unsafe-inline'; report-uri /ContentSecurityPolicy.aspx;"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Jul 2019 21:50:47 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "207"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ErrorCode\": 403,\n    \"ErrorMessage\": \"EXPIRED_AUTHORIZATION_TOKEN\",\n    \"ErrorDescription\": \"Invalid authorization token: {{authToken}}. Please log in again to create a new one.\"\n}"
+				}
+			]
+		}
+	]
+}

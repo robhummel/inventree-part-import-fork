@@ -21,6 +21,7 @@ from .config import (
     get_config_dir,
     set_config_dir,
     setup_inventree_api,
+    sync_categories as sync_categories_from_inventree,
     update_config_file,
     update_supplier_config,
 )
@@ -91,6 +92,7 @@ InteractiveChoices = click.Choice(("default", "false", "true", "twice", "twice-a
     metavar="CATEGORY",
     help="Update all parts from CATEGORY and any of its subcategories.",
 )
+@click.option("--sync-categories", is_flag=True, help="Sync categories/parameters from InvenTree and exit.")
 @click.option("--version", is_flag=True, help="Show version and exit.")
 @handle_errors
 def inventree_part_import(
@@ -106,6 +108,7 @@ def inventree_part_import(
     configure: str | None = None,
     update: str | None = None,
     update_recursive: str | None = None,
+    sync_categories: bool = False,
     version: bool = False,
 ):
     """Import supplier parts into InvenTree.
@@ -156,6 +159,12 @@ def inventree_part_import(
             new_config = update_supplier_config(supplier_object, supplier_config, force_update=True)
             if new_config:
                 suppliers_config[configure] = new_config
+        return
+
+    if sync_categories:
+        if not (inventree_api := setup_inventree_api()):
+            return
+        sync_categories_from_inventree(inventree_api)
         return
 
     if not inputs and not (update or update_recursive):

@@ -120,9 +120,9 @@ def create_manufacturer(inventree_api: InvenTreeAPI, name: str):
     return manufacturer
 
 
-def upload_image(api_object: ImageMixin, image_url: str):
+def upload_image(api_object: ImageMixin, image_url: str, session: Session | None = None):
     info("uploading image ...")
-    image_content, redirected_url = _download_file_content(image_url)
+    image_content, redirected_url = _download_file_content(image_url, session=session)
     if not image_content:
         warning(f"failed to download image from '{image_url}'")
         return
@@ -143,9 +143,9 @@ def upload_image(api_object: ImageMixin, image_url: str):
             warning(f"failed to upload image with: {body}")
 
 
-def upload_datasheet(part: Part, datasheet_url: str):
+def upload_datasheet(part: Part, datasheet_url: str, session: Session | None = None):
     info("uploading datasheet ...")
-    datasheet_content, redirected_url = _download_file_content(datasheet_url)
+    datasheet_content, redirected_url = _download_file_content(datasheet_url, session=session)
     if not datasheet_content:
         warning(f"failed to download datasheet from '{datasheet_url}'")
         return
@@ -173,14 +173,15 @@ def url2filename(url: str):
 
 
 @cache
-def _download_file_content(url: str):
-    session = setup_session(use_tlsv1_2=True)
-    session.headers.update(
-        {
-            "User-Agent": UserAgent(os=["iOS"]).random,
-            "Accept-Language": "en-US,en",
-        }
-    )
+def _download_file_content(url: str, session: Session | None = None):
+    if session is None:
+        session = setup_session(use_tlsv1_2=True)
+        session.headers.update(
+            {
+                "User-Agent": UserAgent(os=["iOS"]).random,
+                "Accept-Language": "en-US,en",
+            }
+        )
 
     result = session.get(url)
     try:

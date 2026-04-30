@@ -224,13 +224,13 @@ class PartImporter:
             update_object_data(part, api_part.get_part_data(), f"part {api_part.MPN}")
 
         if not part.image and api_part.image_url:
-            upload_image(part, api_part.image_url)
+            upload_image(part, api_part.image_url, session=api_part.session)
 
         attachment_types = {attachment.comment for attachment in part.getAttachments()}
         if "datasheet" not in attachment_types and api_part.datasheet_url:
             match get_config().get("datasheets"):
                 case "upload":
-                    upload_datasheet(part, api_part.datasheet_url)
+                    upload_datasheet(part, api_part.datasheet_url, session=api_part.session)
                 case "link":
                     datasheet_url_safe = quote(api_part.datasheet_url, safe=":/")
                     part.addLinkAttachment(datasheet_url_safe[:200], comment="datasheet")
