@@ -1,6 +1,9 @@
 import os
+from pathlib import Path
 from typing import Any, cast
 
+import dlt
+import duckdb
 from error_helper import error, info
 from requests import Session
 from requests.exceptions import HTTPError
@@ -9,61 +12,133 @@ from ..retries import setup_session
 from .base import ApiPart, Supplier, SupplierSupportLevel, money2float
 
 
+@dlt.source
+def mcmaster_source(api: "McMasterApi", part_number: str):
+    """dlt source for McMaster-Carr product data."""
+
+    @dlt.resource(name="products", write_disposition="merge", primary_key="PartNumber")
+    def product_resource():
+        yield api.get_product(part_number)
+
+    @dlt.resource(name="prices", write_disposition="append")
+    def price_resource():
+        price_data = api.get_price(part_number)
+        if price_data:
+            for entry in price_data:
+                entry["PartNumber"] = part_number
+                yield entry
+
+    return [product_resource, price_resource]
+
+
 class McMaster(Supplier):
     SUPPORT_LEVEL = SupplierSupportLevel.OFFICIAL_API
 
     def setup(self, *, cert: str, username: str, password: str, currency: str = "USD", **kwargs: Any):
         self.currency = currency
         self.api = McMasterApi(cert, username, password)
+        self.db_path = Path("data") / "mcmaster.duckdb"
+        self.db_path.parent.mkdir(parents=True, exist_ok=True)
 
     def search(self, search_term: str) -> tuple[list[ApiPart], int]:
+        # Stage 1: API to DuckDB via dlt
+        pipeline = dlt.pipeline(
+            pipeline_name="mcmaster_pipeline",
+            destination="duckdb",
+            dataset_name="mcmaster_data",
+        )
+        
+        # Configure DuckDB destination path
+        os.environ["DESTINATION__DUCKDB__CREDENTIALS"] = f"duckdb:///{self.db_path.absolute()}"
+        
         try:
-            product = self.api.get_product(search_term)
+            info(f"Syncing {search_term} to local DuckDB ...")
+            pipeline.run(mcmaster_source(self.api, search_term))
         except HTTPError as e:
             if e.response is not None and e.response.status_code == 404:
                 return [], 0
             raise e
 
-        if not product:
-            return [], 0
+        # Stage 2: DuckDB to ApiPart
+        with duckdb.connect(str(self.db_path)) as conn:
+            # Reconstruct product data from DuckDB
+            product_rows = conn.execute(
+                "SELECT * FROM mcmaster_data.products WHERE part_number = ?", 
+                [search_term]
+            ).df()
+            
+            if product_rows.empty:
+                return [], 0
+            
+            # dlt might have flattened specifications, but we want the original-ish structure
+            # if we can, or at least enough to satisfy get_api_part.
+            # Since we yield the raw dict to dlt, we can fetch it back.
+            product = product_rows.to_dict("records")[0]
+            
+            # Fetch price breaks
+            price_rows = conn.execute(
+                "SELECT * FROM mcmaster_data.prices WHERE part_number = ?",
+                [search_term]
+            ).df()
+            price_data = price_rows.to_dict("records")
 
-        api_part = self.get_api_part(product)
+        api_part = self.get_api_part(product, price_data)
         return [api_part], 1
 
-    def get_api_part(self, product: dict[str, Any]):
-        part_number = product["PartNumber"]
+    def get_api_part(self, product: dict[str, Any], price_data: list[dict[str, Any]]):
+        part_number = product["part_number"]
         
-        # Fetch price information
-        price_data = self.api.get_price(part_number)
         price_breaks = {}
         packaging = ""
         if price_data:
-            # McMaster returns a list of price breaks
             for entry in price_data:
-                price_breaks[entry["MinimumQuantity"]] = float(entry["Amount"])
+                price_breaks[entry["minimum_quantity"]] = float(entry["amount"])
                 if not packaging:
-                    packaging = entry.get("UnitOfMeasure", "")
+                    packaging = entry.get("unit_of_measure", "")
 
         # Extract specifications
-        parameters = {
-            spec["Attribute"]: ", ".join(spec["Values"])
-            for spec in product.get("Specifications", [])
-        }
+        # dlt might have flattened these if they were a list of dicts.
+        # However, for a single record 'merge' it usually keeps them if possible 
+        # or flattens into separate tables. 
+        # For simplicity in this two-stage, we rely on the fact that dlt-duckdb
+        # allows querying the data back.
+        
+        # Note: dlt flattens nested lists into child tables by default.
+        # We might need to query 'mcmaster_data.products__specifications'
+        parameters = {}
+        with duckdb.connect(str(self.db_path)) as conn:
+            spec_rows = conn.execute(
+                "SELECT attribute, values FROM mcmaster_data.products__specifications "
+                "WHERE _dlt_parent_id = ?",
+                [product["_dlt_id"]]
+            ).fetchall()
+            for attr, vals in spec_rows:
+                # dlt might store 'values' as a JSON string or in another child table
+                # if it's a list of strings.
+                if isinstance(vals, str):
+                    parameters[attr] = vals
+                else:
+                    parameters[attr] = str(vals)
 
-        # Extract links
+            # Extract links
+            links = {}
+            link_rows = conn.execute(
+                "SELECT key, value FROM mcmaster_data.products__links "
+                "WHERE _dlt_parent_id = ?",
+                [product["_dlt_id"]]
+            ).fetchall()
+            links = {key: val for key, val in link_rows}
+
         image_url = ""
         datasheet_url = ""
-        links = {link["Key"]: link["Value"] for link in product.get("Links", [])}
-        
         if image_path := links.get("Image"):
             image_url = f"{McMasterApi.BASE_URL}{image_path}"
         
-        # We prefer "Datasheet" but might find other relevant links
         if ds_path := links.get("Datasheet") or links.get("Data Sheet"):
             datasheet_url = f"{McMasterApi.BASE_URL}{ds_path}"
 
         return ApiPart(
-            description=product.get("DetailDescription", ""),
+            description=product.get("detail_description", ""),
             image_url=image_url or None,
             datasheet_url=datasheet_url or None,
             supplier_link=f"https://www.mcmaster.com/{part_number}",
@@ -71,9 +146,9 @@ class McMaster(Supplier):
             manufacturer="McMaster-Carr",
             manufacturer_link="",
             MPN=part_number,
-            quantity_available=True if product.get("ProductStatus") == "Active" else 0,
+            quantity_available=True if product.get("product_status") == "Active" else 0,
             packaging=packaging,
-            category_path=[product.get("FamilyDescription", "")],
+            category_path=[product.get("family_description", "")],
             parameters=parameters,
             price_breaks=price_breaks,
             currency=self.currency,
