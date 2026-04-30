@@ -2,6 +2,7 @@ import importlib.metadata
 import logging
 from pathlib import Path
 from typing import Any, Callable, Literal, Never, ParamSpec, cast
+import functools
 
 import click
 import error_helper
@@ -24,6 +25,7 @@ from .config import (
     sync_categories as sync_categories_from_inventree,
     update_config_file,
     update_supplier_config,
+    load_suppliers_config,
 )
 from .inventree_helpers import get_category, get_category_parts
 from .part_importer import ImportResult, PartImporter
@@ -33,6 +35,7 @@ P = ParamSpec("P")
 
 
 def handle_errors(func: Callable[P, None]) -> Callable[P, None]:
+    @functools.wraps(func)
     def wrapper(*args: Any, **kwargs: Any):
         try:
             func(*args, **kwargs)
@@ -93,6 +96,8 @@ InteractiveChoices = click.Choice(("default", "false", "true", "twice", "twice-a
     help="Update all parts from CATEGORY and any of its subcategories.",
 )
 @click.option("--sync-categories", is_flag=True, help="Sync categories/parameters from InvenTree and exit.")
+@click.option("--mcmaster-sync", is_flag=True, help="Sync McMaster product data to DuckDB.")
+@click.option("--db-path", type=click.Path(path_type=Path), help="Path to DuckDB database for sync.")
 @click.option("--version", is_flag=True, help="Show version and exit.")
 @handle_errors
 def inventree_part_import(
@@ -109,6 +114,8 @@ def inventree_part_import(
     update: str | None = None,
     update_recursive: str | None = None,
     sync_categories: bool = False,
+    mcmaster_sync: bool = False,
+    db_path: Path | None = None,
     version: bool = False,
 ):
     """Import supplier parts into InvenTree.
@@ -165,6 +172,69 @@ def inventree_part_import(
         if not (inventree_api := setup_inventree_api()):
             return
         sync_categories_from_inventree(inventree_api)
+        return
+
+    if mcmaster_sync:
+        # McMaster sync logic
+        _, available_suppliers = get_suppliers(reload=True, setup=False)
+        if "mcmaster" not in available_suppliers:
+            error("McMaster supplier not found.")
+            return
+
+        mcmaster = available_suppliers["mcmaster"]
+
+        # Load configuration
+        with update_config_file(SUPPLIERS_CONFIG) as suppliers_config:
+            config = suppliers_config.get("mcmaster")
+            if not config:
+                error("McMaster supplier not configured. Run --configure mcmaster first.")
+                return
+
+            try:
+                mcmaster.setup(**config)
+            except Exception as e:
+                error(f"Failed to setup McMaster supplier: {e}")
+                return
+
+        # Process inputs
+        part_numbers: list[str] = []
+        for name in inputs:
+            path = Path(name)
+            if path.is_file():
+                if (file_parts := load_tabular_data_simple(path)) is None:
+                    continue
+                part_numbers += file_parts
+            else:
+                part_numbers.append(name)
+
+        part_numbers = [pn.strip() for pn in part_numbers if pn.strip()]
+        if not part_numbers:
+            info("No part numbers to sync.")
+            return
+
+        # Sync
+        results = mcmaster.sync(part_numbers, db_path=db_path)
+
+        # Summary
+        success_count = sum(1 for r in results.values() if r is True)
+        failure_count = len(results) - success_count
+
+        print()
+        info(f"Sync complete. Total: {len(results)}, Success: {success_count}, Failure: {failure_count}")
+
+        if failure_count > 0:
+            print()
+            warning("Failed parts:")
+            for pn, status in results.items():
+                if status is not True:
+                    print(f"  {pn}: {status}")
+
+        if success_count > 0:
+            print()
+            success("Successfully synced parts:")
+            for pn, status in results.items():
+                if status is True:
+                    print(f"  {pn}")
         return
 
     if not inputs and not (update or update_recursive):
@@ -309,6 +379,32 @@ def inventree_part_import(
     if not failed_parts and not incomplete_parts:
         action = "updated" if update or update_recursive else "imported"
         success(f"{action} all parts!")
+
+
+def load_tabular_data_simple(path: Path):
+    info(f"reading {path.name} ...")
+    with path.open(encoding="utf-8") as file:
+        try:
+            data = tablib.import_set(file)
+        except UnsupportedFormat:
+            # try to import the file as a single column csv file
+            content = path.read_text()
+            return content.splitlines()
+        except TablibException as e:
+            error(f"failed to parse file with '{e.__doc__}'")
+            return None
+
+    if len(data.headers) == 0:
+        return cast(list[str], data.get_col(0))
+
+    # Look for "part_number", "MPN", "Part Number"
+    headers = [h.strip().lower() for h in cast(list[str], data.headers)]
+    for target in ["part_number", "mpn", "part number"]:
+        if target in headers:
+            return cast(list[str], data.get_col(headers.index(target)))
+
+    # Default to first column
+    return cast(list[str], data.get_col(0))
 
 
 def load_tabular_data(path: Path):

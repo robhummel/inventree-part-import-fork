@@ -154,6 +154,19 @@ You will be prompted for:
 
 **Note**: This integration uses a two-stage process. Data is first synced from the API to a local **DuckDB** database (located at `./data/mcmaster.duckdb`) using **dlt**. This ensures that product details and your "subscription" status for parts are persisted even if the import to InvenTree fails.
 
+#### Bulk Sync to DuckDB
+
+You can bulk-sync McMaster product data directly to a local DuckDB database without importing into InvenTree using the `--mcmaster-sync` option:
+
+```console
+$ inventree-part-import --mcmaster-sync 90600A134 90591A250 parts_list.csv
+```
+
+Optional parameters:
+- `--db-path`: Override the default database path (default: `./data/mcmaster.duckdb`).
+
+This is useful for pre-populating a local cache or maintaining a local product database.
+
 **Note**: Searching for a part number for the first time will automatically "subscribe" you to that product in the McMaster-Carr system if you aren't already.
 
 #### DigiKey

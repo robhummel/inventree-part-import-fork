@@ -12,3 +12,5 @@ dist/
 tests/data/
 tests/test_config/
 .worktrees/
+.dlt/
+*.duckdb

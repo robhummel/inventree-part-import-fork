@@ -109,6 +109,13 @@ class Supplier:
     def search(self, search_term: str) -> tuple[list[ApiPart], int]:
         raise NotImplementedError()
 
+    def sync(self, part_numbers: list[str], **kwargs: Any) -> dict[str, bool | str]:
+        """Sync product data for part numbers to a local database.
+
+        Returns a dict mapping part number to success status (True or error message).
+        """
+        raise NotImplementedError(f"Syncing not supported for {self.name}")
+
     def cached_search(self, search_term: str) -> tuple[list[ApiPart], int]:
         if not hasattr(self, "_cache"):
             self._cache: dict[str, tuple[list[ApiPart], int]] = {}

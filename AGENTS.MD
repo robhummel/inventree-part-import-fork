@@ -11,6 +11,9 @@ The McMaster-Carr integration follows a two-stage import process implemented in 
     - A `dlt` pipeline extracts data from the McMaster-Carr API and loads it into a local DuckDB database (`./data/mcmaster.duckdb`).
     - This stage handles the **mTLS Authentication**, **Double-Authentication** (Bearer token), and **Auto-Subscription** logic.
     - Storing data first ensures that subscription states and raw product details are preserved even if the InvenTree import fails.
+4.  **Bulk Sync CLI**: 
+    - The `--mcmaster-sync` flag in `cli.py` allows bypassing the InvenTree import entirely.
+    - It uses `Supplier.sync([part_numbers], db_path=...)` to trigger Stage 1 in bulk.
 2.  **Stage 2: DuckDB to InvenTree**:
     - The `McMaster.search` method queries the local DuckDB database to reconstruct product and pricing data.
     - This data is then transformed into an `ApiPart` object for standard InvenTree import.
@@ -18,7 +21,9 @@ The McMaster-Carr integration follows a two-stage import process implemented in 
 
 ## Implementation Details for Agents
 - **Base Class**: Always inherit from `Supplier`. McMaster is an `OFFICIAL_API` support level.
-- **dlt Source/Resources**: The `mcmaster_source` function defines how products and prices are extracted and loaded.
+- **Sync Method**: The `Supplier.sync` method is the entry point for bulk-loading data to a local DB. `McMaster.search` is refactored to call `self.sync([search_term])`.
+- **Tabular Data**: `load_tabular_data_simple` in `cli.py` is used for non-interactive CSV parsing during sync tasks. It prioritizes common MPN headers.
+- **dlt Source/Resources**: The `mcmaster_source` function defines how products and prices are extracted and loaded. It handles a list of part numbers for batching.
 - **Database Schema**: `dlt` manages the schema in the `mcmaster_data` dataset within DuckDB. Use `duckdb.connect` to query these tables during the transformation stage.
 - **Session Sharing**: If you modify how images or datasheets are downloaded, ensure you respect the `session` parameter in `upload_image`, `upload_datasheet`, and `_download_file_content`.
 - **Error Handling**: The `McMasterApi._request` method handles `403 EXPIRED_AUTHORIZATION_TOKEN` by re-logging in and retrying the request once. Do not remove this logic.

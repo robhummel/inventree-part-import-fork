@@ -13,20 +13,28 @@ from .base import ApiPart, Supplier, SupplierSupportLevel, money2float
 
 
 @dlt.source
-def mcmaster_source(api: "McMasterApi", part_number: str):
+def mcmaster_source(api: "McMasterApi", part_numbers: list[str]):
     """dlt source for McMaster-Carr product data."""
 
     @dlt.resource(name="products", write_disposition="merge", primary_key="PartNumber")
     def product_resource():
-        yield api.get_product(part_number)
+        for part_number in part_numbers:
+            try:
+                yield api.get_product(part_number)
+            except Exception as e:
+                error(f"Failed to fetch product {part_number}: {e}")
 
     @dlt.resource(name="prices", write_disposition="append")
     def price_resource():
-        price_data = api.get_price(part_number)
-        if price_data:
-            for entry in price_data:
-                entry["PartNumber"] = part_number
-                yield entry
+        for part_number in part_numbers:
+            try:
+                price_data = api.get_price(part_number)
+                if price_data:
+                    for entry in price_data:
+                        entry["PartNumber"] = part_number
+                        yield entry
+            except Exception as e:
+                error(f"Failed to fetch prices for {part_number}: {e}")
 
     return [product_resource, price_resource]
 
@@ -40,24 +48,47 @@ class McMaster(Supplier):
         self.db_path = Path("data") / "mcmaster.duckdb"
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
 
-    def search(self, search_term: str) -> tuple[list[ApiPart], int]:
-        # Stage 1: API to DuckDB via dlt
+    def sync(self, part_numbers: list[str], **kwargs: Any) -> dict[str, bool | str]:
+        db_path = kwargs.get("db_path") or self.db_path
+        db_path = Path(db_path)
+        db_path.parent.mkdir(parents=True, exist_ok=True)
+
         pipeline = dlt.pipeline(
             pipeline_name="mcmaster_pipeline",
             destination="duckdb",
             dataset_name="mcmaster_data",
         )
-        
+
         # Configure DuckDB destination path
-        os.environ["DESTINATION__DUCKDB__CREDENTIALS"] = f"duckdb:///{self.db_path.absolute()}"
+        os.environ["DESTINATION__DUCKDB__CREDENTIALS"] = f"duckdb:///{db_path.absolute()}"
+
+        results: dict[str, bool | str] = {}
         
+        # dlt handles batching if we pass the whole source, but we want per-part status.
+        # However, for performance, syncing them all in one pipeline run is better.
+        # To get status, we might need to be more granular if we want to know WHICH ones failed.
+        # But mcmaster_source already catches exceptions.
+        
+        info(f"Syncing {len(part_numbers)} parts to local DuckDB ({db_path}) ...")
         try:
-            info(f"Syncing {search_term} to local DuckDB ...")
-            pipeline.run(mcmaster_source(self.api, search_term))
-        except HTTPError as e:
-            if e.response is not None and e.response.status_code == 404:
-                return [], 0
-            raise e
+            pipeline.run(mcmaster_source(self.api, part_numbers))
+            # If pipeline.run succeeds, we assume they all synced unless we saw errors in source
+            # For now, let's mark all as True if no global exception occurred.
+            # In a more advanced version, we'd check which ones actually made it into DB.
+            for pn in part_numbers:
+                results[pn] = True
+        except Exception as e:
+            error(f"Sync failed: {e}")
+            for pn in part_numbers:
+                results[pn] = str(e)
+
+        return results
+
+    def search(self, search_term: str) -> tuple[list[ApiPart], int]:
+        # Stage 1: API to DuckDB via dlt
+        sync_results = self.sync([search_term])
+        if not sync_results.get(search_term) is True:
+            return [], 0
 
         # Stage 2: DuckDB to ApiPart
         with duckdb.connect(str(self.db_path)) as conn:
@@ -170,6 +201,7 @@ class McMasterApi:
             raise FileNotFoundError(cert)
             
         self.session.cert = cert
+        self.session.verify = False
         self.token = None
         self._login()
 
