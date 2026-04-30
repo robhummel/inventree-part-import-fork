@@ -1,0 +1,777 @@
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this file,
+   - You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr" platform="macosx" style="--font-family: sans-serif; --font-weight: normal;"><head>
+    <title id="reader-title">McMaster-Carr Product Information API</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src chrome:; img-src data: *; media-src *; object-src 'none'">
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <meta name="viewport" content="width=device-width; user-scalable=0">
+    <link rel="stylesheet" href="chrome://global/skin/design-system/tokens-brand.css">
+    <link rel="stylesheet" href="chrome://global/skin/aboutReader.css" type="text/css">
+    <link rel="localization" href="toolkit/about/aboutReader.ftl">
+    <link rel="localization" href="toolkit/branding/brandings.ftl">
+    <script type="module" src="chrome://global/content/reader/moz-slider.mjs"></script>
+    <script type="module" src="chrome://global/content/elements/moz-input-color.mjs"></script>
+    <script type="module" src="chrome://global/content/elements/named-deck.js"></script>
+  <link rel="stylesheet" href="chrome://global/skin/narrate.css"><link rel="shortcut icon" href="https://www.mcmaster.com/favicon.ico"></head>
+
+  <body class="dark loaded" style="--content-width: 30em; --font-size: 20px;">
+    <div class="top-anchor"></div>
+
+    <div id="toolbar" class="toolbar-container scrolled">
+      <div class="toolbar reader-toolbar">
+        <div class="reader-controls" articledir="ltr">
+          <button class="close-button toolbar-button" aria-labelledby="toolbar-close" data-telemetry-id="reader-close">
+            <span class="hover-label" id="toolbar-close" data-l10n-id="about-reader-toolbar-close">Close Reader View</span>
+          </button>
+          <ul class="dropdown text-layout-dropdown">
+            <li>
+              <button class="dropdown-toggle toolbar-button text-layout-button" aria-labelledby="toolbar-text-layout-controls" data-telemetry-id="reader-text-layout-controls">
+                <span class="hover-label" id="toolbar-text-layout-controls" data-l10n-id="about-reader-toolbar-text-layout-controls">Text and layout</span>
+              </button>
+            </li>
+            <li class="dropdown-popup" id="text-layout-controls" tabindex="-1">
+              <h2 data-l10n-id="about-reader-text-header" id="about-reader-text-header">Text</h2>
+              <div id="text-size-controls">
+                <span data-l10n-id="about-reader-text-size-label" id="about-reader-text-size-label">Text size</span>
+                <div class="text-size-buttons buttonrow">
+                  <button class="text-size-minus-button" data-l10n-id="about-reader-toolbar-minus" data-telemetry-id="text-size-minus-button" title="Decrease font size"></button>
+                  <button class="text-size-plus-button" data-l10n-id="about-reader-toolbar-plus" data-telemetry-id="text-size-plus-button" title="Increase font size"></button>
+                </div>
+              </div>
+              <div id="font-controls">
+                <div id="font-type-dropdown" class="dropdown-selector">
+                  <label for="font-type-selector" data-l10n-id="about-reader-font-type-selector-label">Font</label>
+                  <select name="font-type-selector" id="font-type-selector" data-telemetry-id="font-type-selector"><option data-l10n-id="about-reader-font-type-sans-serif" value="sans-serif" selected="selected">Sans-serif</option><option data-l10n-id="about-reader-font-type-serif" value="serif">Serif</option><option data-l10n-id="about-reader-font-type-monospace" value="monospace">Monospace</option></select>
+                </div>
+                <div id="font-weight-dropdown" class="dropdown-selector">
+                  <label for="font-weight-selector" data-l10n-id="about-reader-font-weight-selector-label">Font weight</label>
+                  <select name="font-weight-selector" id="font-weight-selector" data-telemetry-id="font-weight-selector"><option data-l10n-id="about-reader-font-weight-regular" value="regular" selected="selected">Regular</option><option data-l10n-id="about-reader-font-weight-light" value="light">Light</option><option data-l10n-id="about-reader-font-weight-bold" value="bold">Bold</option></select>
+                </div>
+              </div>
+              <hr>
+              <h2 data-l10n-id="about-reader-layout-header" id="about-reader-layout-header">Layout</h2>
+              <div id="content-width-slider" class="slider-container"><moz-slider min="1" max="9" value="3" ticks="9" tick-labels="[]" data-l10n-id="about-reader-content-width-label" data-l10n-attrs="label" slider-icon="chrome://global/skin/reader/content-width-20.svg" data-telemetry-id="content-width-slider" label="Content width"></moz-slider></div>
+              <div id="line-spacing-slider" class="slider-container"><moz-slider min="1" max="9" value="4" ticks="9" tick-labels="[]" data-l10n-id="about-reader-line-spacing-label" data-l10n-attrs="label" slider-icon="chrome://global/skin/reader/line-spacing-20.svg" data-telemetry-id="line-spacing-slider" label="Line spacing"></moz-slider></div>
+              <hr>
+              <details id="about-reader-advanced-layout">
+                <summary class="accordion-header">
+                  <h2 data-l10n-id="about-reader-advanced-layout-header" id="about-reader-advanced-layout-header">Advanced</h2>
+                  <span class="chevron-icon"></span>
+                </summary>
+                <div id="character-spacing-slider" class="slider-container"><moz-slider min="1" max="9" value="1" ticks="9" tick-labels="[&quot;Standard&quot;, &quot;Wide&quot;]" data-l10n-id="about-reader-character-spacing-label" data-l10n-attrs="label" slider-icon="chrome://global/skin/reader/character-spacing-20.svg" data-telemetry-id="character-spacing-slider" label="Character spacing"></moz-slider></div>
+                <div id="word-spacing-slider" class="slider-container"><moz-slider min="1" max="9" value="1" ticks="9" tick-labels="[&quot;Standard&quot;, &quot;Wide&quot;]" data-l10n-id="about-reader-word-spacing-label" data-l10n-attrs="label" slider-icon="chrome://global/skin/reader/word-spacing-20.svg" data-telemetry-id="word-spacing-slider" label="Word spacing"></moz-slider></div>
+                <label for="text-alignment-buttons" data-l10n-id="about-reader-text-alignment-label">Text alignment</label>
+                <div class="text-alignment-buttons radiorow" id="text-alignment-buttons"><input id="radio-itemleft-align-button" type="radio" class="radio-button" name="text-alignment" data-telemetry-id="left-align-button" checked="checked"><label for="radio-itemleft-align-button" class="left-align-button" data-l10n-id="about-reader-text-alignment-left" checked="true" title="Align text left"></label><input id="radio-itemcenter-align-button" type="radio" class="radio-button" name="text-alignment" data-telemetry-id="center-align-button"><label for="radio-itemcenter-align-button" class="center-align-button" data-l10n-id="about-reader-text-alignment-center" title="Align text center"></label><input id="radio-itemright-align-button" type="radio" class="radio-button" name="text-alignment" data-telemetry-id="right-align-button"><label for="radio-itemright-align-button" class="right-align-button" data-l10n-id="about-reader-text-alignment-right" title="Align text right"></label><input id="radio-itemjustify-align-button" type="radio" class="radio-button" name="text-alignment" data-telemetry-id="justify-align-button"><label for="radio-itemjustify-align-button" class="justify-align-button" data-l10n-id="about-reader-text-alignment-justify" title="Justify text"></label></div>
+                <button class="text-layout-reset-button reset-button" data-l10n-id="about-reader-reset-button">Reset defaults</button>
+              </details>
+            </li>
+          </ul>
+          <ul class="dropdown colors-dropdown">
+            <li>
+              <button class="dropdown-toggle toolbar-button colors-button" aria-labelledby="toolbar-color-controls" data-telemetry-id="reader-color-controls">
+                <span class="hover-label" id="toolbar-color-controls" data-l10n-id="about-reader-toolbar-theme-controls">Theme</span>
+              </button>
+            </li>
+            <li class="dropdown-popup" id="color-controls">
+              <h2 data-l10n-id="about-reader-colors-menu-header" id="about-reader-colors-menu-header">Theme</h2>
+              <button-group aria-labelledby="about-reader-colors-menu-header" role="tablist">
+                <button is="named-deck-button" deck="tabs-deck" name="fxtheme" data-l10n-id="about-reader-fxtheme-tab" data-telemetry-id="colors-menu-default-tab" id="tabs-deck-button-fxtheme" role="tab" aria-selected="true" tabindex="0" selected="">Default</button>
+                <button is="named-deck-button" deck="tabs-deck" name="customtheme" data-l10n-id="about-reader-customtheme-tab" data-telemetry-id="colors-menu-custom-tab" id="tabs-deck-button-customtheme" role="tab" aria-selected="false" tabindex="-1">Custom</button>
+              </button-group>
+              <named-deck id="tabs-deck" is-tabbed="" selected-view="fxtheme">
+                <div name="fxtheme" class="color-scheme-buttons radiorow" aria-labelledby="tabs-deck-button-fxtheme" role="tabpanel" slot="selected"><input id="radio-itemauto-button" type="radio" class="radio-button" name="color-scheme" data-telemetry-id="auto-button" checked="checked"><label for="radio-itemauto-button" class="auto-button" data-l10n-id="about-reader-color-auto-theme" checked="true" title="Auto theme">Auto</label><input id="radio-itemlight-button" type="radio" class="radio-button" name="color-scheme" data-telemetry-id="light-button"><label for="radio-itemlight-button" class="light-button" data-l10n-id="about-reader-color-light-theme" title="Light theme">Light</label><input id="radio-itemdark-button" type="radio" class="radio-button" name="color-scheme" data-telemetry-id="dark-button"><label for="radio-itemdark-button" class="dark-button" data-l10n-id="about-reader-color-dark-theme" title="Dark theme">Dark</label><input id="radio-itemsepia-button" type="radio" class="radio-button" name="color-scheme" data-telemetry-id="sepia-button"><label for="radio-itemsepia-button" class="sepia-button" data-l10n-id="about-reader-color-sepia-theme" title="Sepia theme">Sepia</label><input id="radio-itemcontrast-button" type="radio" class="radio-button" name="color-scheme" data-telemetry-id="contrast-button"><label for="radio-itemcontrast-button" class="contrast-button" data-l10n-id="about-reader-color-contrast-theme" title="Contrast theme">Contrast</label><input id="radio-itemgray-button" type="radio" class="radio-button" name="color-scheme" data-telemetry-id="gray-button"><label for="radio-itemgray-button" class="gray-button" data-l10n-id="about-reader-color-gray-theme" title="Gray theme">Gray</label></div>
+                <div name="customtheme" aria-labelledby="tabs-deck-button-customtheme" role="tabpanel" slot="">
+                  <ul class="custom-colors-selection"><li><moz-input-color name="foreground" data-l10n-id="about-reader-custom-colors-foreground2" value="#14151A" data-l10n-attrs="label" label="Text" title="Edit color"></moz-input-color></li><li><moz-input-color name="background" data-l10n-id="about-reader-custom-colors-background2" value="#FFFFFF" data-l10n-attrs="label" label="Background" title="Edit color"></moz-input-color></li><li><moz-input-color name="unvisited-links" data-l10n-id="about-reader-custom-colors-unvisited-links2" value="#0060DF" data-l10n-attrs="label" label="Unvisited links" title="Edit color"></moz-input-color></li><li><moz-input-color name="visited-links" data-l10n-id="about-reader-custom-colors-visited-links2" value="#321C64" data-l10n-attrs="label" label="Visited links" title="Edit color"></moz-input-color></li><li><moz-input-color name="selection-highlight" data-l10n-id="about-reader-custom-colors-selection-highlight2" value="#FFFFCC" data-l10n-attrs="label" label="Highlighter for read aloud" title="Edit color"></moz-input-color></li></ul>
+                  <button class="custom-colors-reset-button reset-button" data-l10n-id="about-reader-reset-button" hidden="">Reset defaults</button>
+                </div>
+              </named-deck>
+            </li>
+          </ul>
+        <ul class="dropdown narrate-dropdown"><li><button class="dropdown-toggle toolbar-button narrate-toggle" data-telemetry-id="reader-listen" aria-label="Read aloud (N)"><span class="hover-label">Read aloud (N)</span></button></li><li class="dropdown-popup"><h2 id="narrate-header">Read aloud</h2><div class="narrate-row narrate-control"><button class="narrate-skip-previous" disabled="disabled" aria-keyshortcuts="ArrowLeft" title="Back (←)"></button><button class="narrate-start-stop" aria-keyshortcuts="N" title="Start (N)"></button><button class="narrate-skip-next" disabled="disabled" aria-keyshortcuts="ArrowRight" title="Forward (→)"></button></div><div class="narrate-row narrate-rate"><span class="narrate-rate-icon slow" title="Slow down narration"></span><input class="narrate-rate-input" value="0" step="5" max="100" min="-100" type="range" aria-label="Choose a narration speed from -100 to 100, where 0 is the default speed." title="Speed"><span class="narrate-rate-icon fast" title="Speed up narration"></span></div><hr><h2 id="voice-header">Voice</h2><div class="narrate-row narrate-voices"><div class="voiceselect voice-select"><button class="select-toggle" aria-controls="voice-options" aria-expanded="false" role="combobox" aria-labelledby="voice-header">
+      <span class="current-voice">Default</span>
+    </button>
+    <div class="options" id="voice-options" role="listbox" style="max-height: 839px;"><button data-value="automatic" class="option selected" tabindex="-1" role="option" aria-selected="true">Default</button><button data-value="urn:moz-tts:osx:com.apple.speech.synthesis.voice.Albert" class="option" tabindex="-1" role="option">Albert (English)</button><button data-value="urn:moz-tts:osx:com.apple.voice.Aman" class="option" tabindex="-1" role="option">Aman (English)</button><button data-value="urn:moz-tts:osx:com.apple.speech.synthesis.voice.BadNews" class="option" tabindex="-1" role="option">Bad News (English)</button><button data-value="urn:moz-tts:osx:com.apple.speech.synthesis.voice.Bahh" class="option" tabindex="-1" role="option">Bahh (English)</button><button data-value="urn:moz-tts:osx:com.apple.speech.synthesis.voice.Bells" class="option" tabindex="-1" role="option">Bells (English)</button><button data-value="urn:moz-tts:osx:com.apple.speech.synthesis.voice.Boing" class="option" tabindex="-1" role="option">Boing (English)</button><button data-value="urn:moz-tts:osx:com.apple.speech.synthesis.voice.Bubbles" class="option" tabindex="-1" role="option">Bubbles (English)</button><button data-value="urn:moz-tts:osx:com.apple.speech.synthesis.voice.Cellos" class="option" tabindex="-1" role="option">Cellos (English)</button><button data-value="urn:moz-tts:osx:com.apple.voice.compact.en-GB.Daniel" class="option" tabindex="-1" role="option">Daniel (English)</button><button data-value="urn:moz-tts:osx:com.apple.eloquence.en-GB.Eddy" class="option" tabindex="-1" role="option">Eddy (English (UK)) (English)</button><button data-value="urn:moz-tts:osx:com.apple.eloquence.en-US.Eddy" class="option" tabindex="-1" role="option">Eddy (English (US)) (English)</button><button data-value="urn:moz-tts:osx:com.apple.eloquence.en-GB.Flo" class="option" tabindex="-1" role="option">Flo (English (UK)) (English)</button><button data-value="urn:moz-tts:osx:com.apple.eloquence.en-US.Flo" class="option" tabindex="-1" role="option">Flo (English (US)) (English)</button><button data-value="urn:moz-tts:osx:com.apple.speech.synthesis.voice.Fred" class="option" tabindex="-1" role="option">Fred (English)</button><button data-value="urn:moz-tts:osx:com.apple.speech.synthesis.voice.GoodNews" class="option" tabindex="-1" role="option">Good News (English)</button><button data-value="urn:moz-tts:osx:com.apple.eloquence.en-GB.Grandma" class="option" tabindex="-1" role="option">Grandma (English (UK)) (English)</button><button data-value="urn:moz-tts:osx:com.apple.eloquence.en-US.Grandma" class="option" tabindex="-1" role="option">Grandma (English (US)) (English)</button><button data-value="urn:moz-tts:osx:com.apple.eloquence.en-GB.Grandpa" class="option" tabindex="-1" role="option">Grandpa (English (UK)) (English)</button><button data-value="urn:moz-tts:osx:com.apple.eloquence.en-US.Grandpa" class="option" tabindex="-1" role="option">Grandpa (English (US)) (English)</button><button data-value="urn:moz-tts:osx:com.apple.speech.synthesis.voice.Hysterical" class="option" tabindex="-1" role="option">Jester (English)</button><button data-value="urn:moz-tts:osx:com.apple.speech.synthesis.voice.Junior" class="option" tabindex="-1" role="option">Junior (English)</button><button data-value="urn:moz-tts:osx:com.apple.voice.compact.en-AU.Karen" class="option" tabindex="-1" role="option">Karen (English)</button><button data-value="urn:moz-tts:osx:com.apple.speech.synthesis.voice.Kathy" class="option" tabindex="-1" role="option">Kathy (English)</button><button data-value="urn:moz-tts:osx:com.apple.voice.compact.en-IE.Moira" class="option" tabindex="-1" role="option">Moira (English)</button><button data-value="urn:moz-tts:osx:com.apple.speech.synthesis.voice.Organ" class="option" tabindex="-1" role="option">Organ (English)</button><button data-value="urn:moz-tts:osx:com.apple.speech.synthesis.voice.Ralph" class="option" tabindex="-1" role="option">Ralph (English)</button><button data-value="urn:moz-tts:osx:com.apple.eloquence.en-GB.Reed" class="option" tabindex="-1" role="option">Reed (English (UK)) (English)</button><button data-value="urn:moz-tts:osx:com.apple.eloquence.en-US.Reed" class="option" tabindex="-1" role="option">Reed (English (US)) (English)</button><button data-value="urn:moz-tts:osx:com.apple.voice.compact.en-IN.Rishi" class="option" tabindex="-1" role="option">Rishi (English)</button><button data-value="urn:moz-tts:osx:com.apple.eloquence.en-GB.Rocko" class="option" tabindex="-1" role="option">Rocko (English (UK)) (English)</button><button data-value="urn:moz-tts:osx:com.apple.eloquence.en-US.Rocko" class="option" tabindex="-1" role="option">Rocko (English (US)) (English)</button><button data-value="urn:moz-tts:osx:com.apple.voice.compact.en-US.Samantha" class="option" tabindex="-1" role="option">Samantha (English)</button><button data-value="urn:moz-tts:osx:com.apple.eloquence.en-GB.Sandy" class="option" tabindex="-1" role="option">Sandy (English (UK)) (English)</button><button data-value="urn:moz-tts:osx:com.apple.eloquence.en-US.Sandy" class="option" tabindex="-1" role="option">Sandy (English (US)) (English)</button><button data-value="urn:moz-tts:osx:com.apple.eloquence.en-GB.Shelley" class="option" tabindex="-1" role="option">Shelley (English (UK)) (English)</button><button data-value="urn:moz-tts:osx:com.apple.eloquence.en-US.Shelley" class="option" tabindex="-1" role="option">Shelley (English (US)) (English)</button><button data-value="urn:moz-tts:osx:com.apple.speech.synthesis.voice.Princess" class="option" tabindex="-1" role="option">Superstar (English)</button><button data-value="urn:moz-tts:osx:com.apple.voice.Tara" class="option" tabindex="-1" role="option">Tara (English)</button><button data-value="urn:moz-tts:osx:com.apple.voice.compact.en-ZA.Tessa" class="option" tabindex="-1" role="option">Tessa (English)</button><button data-value="urn:moz-tts:osx:com.apple.speech.synthesis.voice.Trinoids" class="option" tabindex="-1" role="option">Trinoids (English)</button><button data-value="urn:moz-tts:osx:com.apple.speech.synthesis.voice.Whisper" class="option" tabindex="-1" role="option">Whisper (English)</button><button data-value="urn:moz-tts:osx:com.apple.speech.synthesis.voice.Deranged" class="option" tabindex="-1" role="option">Wobble (English)</button><button data-value="urn:moz-tts:osx:com.apple.speech.synthesis.voice.Zarvox" class="option" tabindex="-1" role="option">Zarvox (English)</button></div></div></div></li></ul></div>
+      </div>
+    </div>
+
+    <div class="container" style="--line-height: 1.6em; --letter-spacing: 0.00em; --word-spacing: 0.00em; --text-alignment: start; --block-img-margin-right: unset; --block-img-margin-left: unset;" lang="en" dir="ltr">
+      <div class="header reader-header reader-show-element">
+        <a class="domain reader-domain" href="https://www.mcmaster.com/help/api/">mcmaster.com</a>
+        <div class="domain-border"></div>
+        <h1 class="reader-title">McMaster-Carr Product Information API</h1>
+        <div class="credits reader-credits"></div>
+        <div class="meta-data">
+          <div class="reader-estimated-time" data-l10n-args="{&quot;range&quot;:&quot;21–26&quot;,&quot;rangePlural&quot;:&quot;other&quot;}" data-l10n-id="about-reader-estimated-read-time" dir="ltr">21–26 minutes</div>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="content">
+        <div class="moz-reader-content reader-show-element"><div id="readability-page-1" class="page"><div>
+        <h2>Introduction</h2>
+        <div><p>
+            The McMaster-Carr Product Information API provides an external method for programmatically retrieving our
+            publicly available product information. Using this service, approved customers can import data on our
+            product offering into their own systems and stay up to date as specifications change. This API uses REST
+            principles and the authorization scheme, requests, responses, and error codes described below.
+            </p><p>
+            You can view sample requests by downloading our 
+            <a href="https://www.mcmaster.com/help/api/McMaster-Carr_Product_Info.postman_collection.json">Postman collection JSON</a> and importing it
+            into Postman. After integrating with our system, you can test responses using the imported collection.
+            </p><p>
+            Please reach out to us at <a href="mailto:  eprocurement@mcmaster.com"> eprocurement@mcmaster.com</a> if you have
+            any questions or would like to begin the integration process.
+        </p></div>
+    </div><div>
+        <h2>Authorization</h2>
+        <h3>Certificates</h3>
+        <p>McMaster-Carr provides a client certificate and an accompanying password for each approved customer. The
+            client certificate must be attached to each request. </p>
+        <h3>Authentication</h3>
+        <p>To use the API, users must start by making a <a href="#logIn">Log In</a> request. If the client certificate,
+            username, and password are all correct and authorized, the API will respond with an authorization token and
+            the time that it will expire. This authorization token must be included as a bearer token on all subsequent
+            requests. For example,</p>
+        <p><code>Authorization: Bearer anZXMWd403820879912OWCtRaWsyaFFXTURVeWhRRHZ6QTJSZw==</code></p><p>Multiple authorization tokens can be valid at the same time for each user. A token expires when it is used in
+            a <a href="#logOut">Log Out</a> request or automatically after 24 hours.</p>
+        <h3>Limits on data retrieval</h3>
+        <p>To get data on a certain product, you must subscribe to information on it through an <a href="#addProduct">Add
+                Product</a> request. In order to protect our data, each user has limits on how many product
+            subscriptions they can maintain in total as well as how many can be added each day.</p>
+        <p>In order to ensure that all users are able to get the information that they need, bandwidth-intensive
+            endpoints, such as retrieving CAD files, are rate-limited. </p>
+        <h3>Errors</h3>
+        <p>When a server error occurs, we will send a response body in the following format:</p>
+        <p><code>
+                {
+                <br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorCode": 500,
+                <br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorMessage": "INTERNAL_SERVER_ERROR",
+                <br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorDescription": "An internal server error occurred."
+                <br>}
+            </code></p><p>The status code of the response will match the <i>ErrorCode</i> property and depend on the error. The
+            <i>ErrorMessage</i> is the category of error. The <i>ErrorDescription</i> property describes the error in
+            more detail, sometimes including scenario-specific information related to your account or part number. The
+            errors specific to each request can be found in Requests, but common errors across different requests are
+            listed below. Note that INTERNAL_SERVER_ERROR responses mean there was an unexpected error on our end.
+            Please reach out to us for further investigation.</p>
+        <table>
+            <tbody><tr>
+                <th>Code</th>
+                <th>Message</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>400</td>
+                <td>BAD_REQUEST</td>
+                <td>Improperly formed request. Please check your POST body for errors.</td>
+            </tr>
+            <tr>
+                <td>400</td>
+                <td>BAD_REQUEST</td>
+                <td>Invalid part number: <i>{{PARTNUMBER}}</i></td>
+            </tr>
+            <tr>
+                <td>400</td>
+                <td>BAD_REQUEST</td>
+                <td>Invalid file path requested</td>
+            </tr>
+            <tr>
+                <td>400</td>
+                <td>BAD_REQUEST</td>
+                <td>Invalid file type requested</td>
+            </tr>
+            <tr>
+                <td>403</td>
+                <td>EXPIRED_AUTHORIZATION_TOKEN</td>
+                <td>Invalid authorization token: <i>{{authToken}}</i>. Please log in again to create a
+                    new one.</td>
+            </tr>
+            <tr>
+                <td>403</td>
+                <td>NOT_SUBSCRIBED_TO_PRODUCT</td>
+                <td>You are not subscribed to this product: <i>{{partNumber}}</i></td>
+            </tr>
+            <tr>
+                <td>500</td>
+                <td>INTERNAL_SERVER_ERROR</td>
+                <td>An internal server error occurred.</td>
+            </tr>
+        </tbody></table>
+    </div><div>
+        <h2>Requests</h2>
+        <h3>Overview</h3>
+        <p>This table summarizes all of the requests that can be made to the McMaster-Carr Product Information API</p>
+        <table>
+            <tbody><tr>
+                <th>Name</th>
+                <th>Http Method</th>
+                <th>Uri Stem</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><a href="#logIn">Log in</a></td>
+                <td>POST</td>
+                <td>/v1/login</td>
+                <td>This request logs in users with valid credentials and certificates to return an authorization token.
+                </td>
+            </tr>
+            <tr>
+                <td><a href="#logOut">Log out</a></td>
+                <td>POST</td>
+                <td>/v1/logout</td>
+                <td>Log out the user by expiring the authorization token</td>
+            </tr>
+            <tr>
+                <td><a href="#addProduct">Add product</a></td>
+                <td>PUT</td>
+                <td>/v1/products</td>
+                <td>Adds a product to the user's list of subscribed products and returns the information for the product
+                </td>
+            </tr>
+            <tr>
+                <td><a href="#removeProduct">Remove product</a></td>
+                <td>DELETE</td>
+                <td>/v1/products</td>
+                <td>Removes a product from a user's list of subscribed products</td>
+            </tr>
+            <tr>
+                <td><a href="#productInformation">Product information</a></td>
+                <td>GET</td>
+                <td>/v1/products/*</td>
+                <td>Retrieves product information for a given part number
+                </td>
+            </tr>
+            <tr>
+                <td><a href="#price">Price</a></td>
+                <td>GET</td>
+                <td>/v1/products/*/price</td>
+                <td>Retrieves the current price of a certain product</td>
+            </tr>
+            <tr>
+                <td><a href="#image">Image</a></td>
+                <td>GET</td>
+                <td>/v1/images/*</td>
+                <td>Retrieves an image from a relative path</td>
+            </tr>
+            <tr>
+                <td><a href="#cAD">CAD</a></td>
+                <td>GET</td>
+                <td>/v1/cad/*</td>
+                <td>Retrieves a CAD file from a relative path</td>
+            </tr>
+            <tr>
+                <td><a href="#datasheet">Datasheet</a></td>
+                <td>GET</td>
+                <td>/v1/datasheets/*</td>
+                <td>Retrieves a datasheet from a relative path</td>
+            </tr>
+        </tbody></table>
+        <h3>Details</h3>
+        <h4 id="logIn">Log in</h4>
+        <table class="moz-reader-wide-table">
+            <tbody><tr>
+                <th>Request</th>
+                <td colspan="3">This request logs in users with valid credentials and certificates to return an
+                    authorization token.</td>
+            </tr>
+            <tr>
+                <th>Url</th>
+                <td colspan="3">https://api.mcmaster.com/v1/login</td>
+            </tr>
+            <tr>
+                <th>Method</th>
+                <td colspan="3">POST</td>
+            </tr>
+            <tr>
+                <th>Request Body</th>
+                <td colspan="3">
+                    <code>{<br>&nbsp;&nbsp;&nbsp;&nbsp;"UserName":"<i>{{username}}</i>",<br>&nbsp;&nbsp;&nbsp;&nbsp;"Password":"<i>{{password}}</i>"<br>}</code>
+                </td>
+            </tr>
+            <tr>
+                <th rowspan="2">Success Responses</th>
+                <th>Example</th>
+                <td colspan="2">
+                    <code>{<br>&nbsp;&nbsp;&nbsp;&nbsp;"AuthToken": "VXVPTHM746877516169vUkVXTFdvYTV0U1I2VTZidnNYVzc3OCtBPT0=",<br>&nbsp;&nbsp;&nbsp;&nbsp;"ExpirationTS": "2019-07-23T22:08:50.6227667Z"<br>}</code>
+                </td>
+            </tr>
+            <tr>
+                <th>Codes</th>
+                <th>200</th>
+                <td>OK</td>
+            </tr>
+            <tr>
+                <th rowspan="6">Error Responses</th>
+                <th>Example</th>
+                <td colspan="2">
+                    <code>{<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorCode": 401,<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorMessage": "LOGIN_FAILED",<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorDescription": "Login failed."<br>}</code>
+                </td>
+            </tr>
+            <tr>
+                <th rowspan="6">Codes</th>
+                <th>400</th>
+                <td>Bad Request, Improperly formed request. Please check your POST body for errors.</td>
+            </tr>
+            <tr>
+                <th>401</th>
+                <td>Unauthorized, Login failed.</td>
+            </tr>
+            <tr>
+                <th>401</th>
+                <td>Unauthorized, Too many failed login attempts.</td>
+            </tr>
+            <tr>
+                <th>401</th>
+                <td>Unauthorized, Incorrect username or password.</td>
+            </tr>
+            <tr>
+                <th>401</th>
+                <td>Unauthorized, This account ID is not authorized for the API: <i>{{account ID}}</i>
+                </td>
+            </tr>
+        </tbody></table>
+        <h4 id="logOut">Log out</h4>
+        <table>
+            <tbody><tr>
+                <th>Request</th>
+                <td colspan="3">Log out the user by expiring the authorization token</td>
+            </tr>
+            <tr>
+                <th>Url</th>
+                <td colspan="3">https://api.mcmaster.com/v1/logout</td>
+            </tr>
+            <tr>
+                <th>Method</th>
+                <td colspan="3">POST</td>
+            </tr>
+            <tr>
+                <th>Request Body</th>
+                <td colspan="3">N/A</td>
+            </tr>
+            <tr>
+                <th rowspan="2">Success Responses</th>
+                <th>Example</th>
+                <td colspan="2">Empty response body</td>
+            </tr>
+            <tr>
+                <th>Codes</th>
+                <th>204</th>
+                <td>No Content</td>
+            </tr>
+            <tr>
+                <th rowspan="2">Error Responses</th>
+                <th>Example</th>
+                <td colspan="2">
+                    <code>{<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorCode": 500,<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorMessage": "INTERNAL_SERVER_ERROR",<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorDescription": "An internal server error occurred."<br>}</code>
+                </td>
+            </tr>
+            <tr>
+                <th rowspan="2">Codes</th>
+                <th>403</th>
+                <td>Forbidden, Invalid authorization token: <i>{{authToken}}</i>. Please log in again
+                    to create a new one.</td>
+            </tr>
+        </tbody></table>
+        <h4 id="addProduct">Add product</h4>
+        <table class="moz-reader-wide-table">
+            <tbody><tr>
+                <th>Request</th>
+                <td colspan="3">Adds a product to the user's list of subscribed products and returns the information for
+                    the product</td>
+            </tr>
+            <tr>
+                <th>Url</th>
+                <td colspan="3">https://api.mcmaster.com/v1/products</td>
+            </tr>
+            <tr>
+                <th>Method</th>
+                <td colspan="3">PUT</td>
+            </tr>
+            <tr>
+                <th>Request Body</th>
+                <td colspan="3">
+                    <code>{"URL":"https://mcmaster.com/<i>{{partNumber}}</i>"}</code></td>
+            </tr>
+            <tr>
+                <th rowspan="3">Success Responses</th>
+                <th>Example</th>
+                <td colspan="2">
+                    <code>{<br>&nbsp;&nbsp;&nbsp;&nbsp;"PartNumber": "4936K451",<br>&nbsp;&nbsp;&nbsp;&nbsp;"ProductStatus": "Active",<br>&nbsp;&nbsp;&nbsp;&nbsp;"FamilyDescription": "Compact Extreme-Pressure Steel Pipe Fitting",<br>&nbsp;&nbsp;&nbsp;&nbsp;"DetailDescription": "Adapter, 1/2 NPT Female, M20 x 1.5mm Male Thread",<br>&nbsp;&nbsp;&nbsp;&nbsp;"Specifications": [<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Attribute": "Shape",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Values": [<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Straight"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Attribute": "For Use With",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Values": [<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Water",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Air",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Hydraulic Fluid",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Oil"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;],<br>&nbsp;&nbsp;&nbsp;&nbsp;"Links": [<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Key": "Price",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Value": "/v1/products/4936K451/price"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Key": "Image",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Value":
+ 
+"/v1/images/contents/gfx/imagecache/493/4936k451p1-c01d-
+digitall@1x_636616342399401664.png"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Key": "2-D DWG",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Value":
+ 
+"/v1/cad/library/20180924/4936K451_COMPACT%20EXTREME-
+PRESSURE%20STEEL%20PIPE%20FITTING.DWG"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Key": "3-D STEP",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Value":
+ 
+"/v1/cad/library/20180924/4936K451_COMPACT%20EXTREME-
+PRESSURE%20STEEL%20PIPE%20FITTING.STEP"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;]<br>}</code>
+                </td>
+            </tr>
+            <tr>
+                <th rowspan="2">Codes</th>
+                <th>200</th>
+                <td>OK</td>
+            </tr>
+            <tr>
+                <th>201</th>
+                <td>Created</td>
+            </tr>
+            <tr>
+                <th rowspan="3">Error Responses</th>
+                <th>Example</th>
+                <td colspan="2">
+                    <code>{<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorCode": 403,<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorMessage": "EXPIRED_AUTHORIZATION_TOKEN",<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorDescription": "Invalid authorization token: <i>{{authToken}}</i>. Please log in again to create a new one."<br>}</code>
+                </td>
+            </tr>
+            <tr>
+                <th rowspan="2">Codes</th>
+                <th>400</th>
+                <td>Bad Request, Invalid part number: <i>{{PARTNUMBER}}</i></td>
+            </tr>
+            <tr>
+                <th>403</th>
+                <td>Forbidden, Invalid authorization token: <i>{{authToken}}</i>. Please log in again
+                    to create a new one.</td>
+            </tr>
+        </tbody></table>
+        <h4 id="removeProduct">Remove product</h4>
+        <table>
+            <tbody><tr>
+                <th>Request</th>
+                <td colspan="3">Removes a product from a user's list of subscribed products</td>
+            </tr>
+            <tr>
+                <th>Url</th>
+                <td colspan="3">https://api.mcmaster.com/v1/products</td>
+            </tr>
+            <tr>
+                <th>Method</th>
+                <td colspan="3">DELETE</td>
+            </tr>
+            <tr>
+                <th>Request Body</th>
+                <td colspan="3">
+                    <code>{"URL":"https://mcmaster.com/<i>{{partNumber}}</i>"}</code></td>
+            </tr>
+            <tr>
+                <th rowspan="3">Success Responses</th>
+                <th>Example</th>
+                <td colspan="2">Empty response body</td>
+            </tr>
+            <tr>
+                <th rowspan="2">Codes</th>
+                <th>204</th>
+                <td>No Content</td>
+            </tr>
+            <tr>
+                <th>404</th>
+                <td>Not Found, Not subscribed to part number: <i>{{partNumber}}</i>. No subscription to
+                    remove</td>
+            </tr>
+            <tr>
+                <th rowspan="4">Error Responses</th>
+                <th>Example</th>
+                <td colspan="2">
+                    <code>{<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorCode": 400,<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorMessage": "BAD_REQUEST",<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorDescription": "Improperly formed request. Please check your POST body for errors."<br>}</code>
+                </td>
+            </tr>
+            <tr>
+                <th rowspan="3">Codes</th>
+                <th>400</th>
+                <td>Bad Request, Improperly formed request. Please check your POST body for errors.</td>
+            </tr>
+            <tr>
+                <th>400</th>
+                <td>Bad Request, Invalid part number: <i>{{PARTNUMBER}}</i></td>
+            </tr>
+            <tr>
+                <th>403</th>
+                <td>Forbidden, Invalid authorization token: <i>{{authToken}}</i>. Please log in again
+                    to create a new one.</td>
+            </tr>
+        </tbody></table>
+        <h4 id="productInformation">Product information</h4>
+        <table class="moz-reader-wide-table">
+            <tbody><tr>
+                <th>Request</th>
+                <td colspan="3">Retrieves product information for a given part number
+                    <p>Discontinued products will be marked inactive and contain a link to a suggested replacement, if
+                        there is one. Any differences between the originally requested and suggested replacement parts
+                        will be listed as <i>SuggestedProductDifferences</i>.</p>
+                </td>
+            </tr>
+            <tr>
+                <th>Url</th>
+                <td colspan="3">https://api.mcmaster.com/v1/products/<i>{{partNumber}}</i></td>
+            </tr>
+            <tr>
+                <th>Method</th>
+                <td colspan="3">GET</td>
+            </tr>
+            <tr>
+                <th>Request Body</th>
+                <td colspan="3">N/A</td>
+            </tr>
+            <tr>
+                <th rowspan="4">Success Responses</th>
+                <th>Example</th>
+                <td colspan="2">
+                    <code>{<br>&nbsp;&nbsp;&nbsp;&nbsp;"PartNumber": "4936K451",<br>&nbsp;&nbsp;&nbsp;&nbsp;"ProductStatus": "Active",<br>&nbsp;&nbsp;&nbsp;&nbsp;"FamilyDescription": "Compact Extreme-Pressure Steel Pipe Fitting",<br>&nbsp;&nbsp;&nbsp;&nbsp;"DetailDescription": "Adapter, 1/2 NPT Female, M20 x 1.5mm Male Thread",<br>&nbsp;&nbsp;&nbsp;&nbsp;"Specifications": [<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Attribute": "Shape",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Values": [<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Straight"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Attribute": "For Use With",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Values": [<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Water",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Air",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Hydraulic Fluid",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Oil"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;],<br>&nbsp;&nbsp;&nbsp;&nbsp;"Links": [<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Key": "Price",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Value": "/v1/products/4936K451/price"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Key": "Image",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Value":
+ 
+"/v1/images/contents/gfx/imagecache/493/4936k451p1-c01d-
+digitall@1x_636616342399401664.png"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Key": "2-D DWG",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Value":
+ 
+"/v1/cad/library/20180924/4936K451_COMPACT%20EXTREME-
+PRESSURE%20STEEL%20PIPE%20FITTING.DWG"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Key": "3-D STEP",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Value":
+ 
+"/v1/cad/library/20180924/4936K451_COMPACT%20EXTREME-
+PRESSURE%20STEEL%20PIPE%20FITTING.STEP"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;]<br>}</code>
+                </td>
+            </tr>
+            <tr>
+                <th>Codes</th>
+                <th>200</th>
+                <td>OK</td>
+            </tr>
+            <tr>
+                <th>Example (Discontinued)</th>
+                <td colspan="2">
+                    <code>{<br>&nbsp;&nbsp;&nbsp;&nbsp;"PartNumber": "1149A81",<br>&nbsp;&nbsp;&nbsp;&nbsp;"ProductStatus": "Discontinued",<br>&nbsp;&nbsp;&nbsp;&nbsp;"Links": [<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Key": "SuggestedProduct",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Value": "https://www.mcmaster.com/15185A41"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;],<br>&nbsp;&nbsp;&nbsp;&nbsp;"SuggestedProductDifferences": [<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Attribute": "Material",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"DiscontinuedProductValue": "Plastic",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"SuggestedProductValue": "Stainless Steel"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Attribute": "Width",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"DiscontinuedProductValue": "1-3/4\"",<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"SuggestedProductValue": "2\""<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;]<br>}</code>
+                </td>
+            </tr>
+            <tr>
+                <th>Codes</th>
+                <th>200</th>
+                <td>OK</td>
+            </tr>
+            <tr>
+                <th rowspan="3">Error Responses</th>
+                <th>Example</th>
+                <td colspan="2">
+                    <code>{<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorCode": 403,<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorMessage": "EXPIRED_AUTHORIZATION_TOKEN",<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorDescription": "Invalid authorization token: <i>{{authToken}}</i>. Please log in again to create a new one."<br>}</code>
+                </td>
+            </tr>
+            <tr>
+                <th rowspan="2">Codes</th>
+                <th>403</th>
+                <td>Forbidden, Invalid authorization token: <i>{{authToken}}</i>. Please log in again
+                    to create a new one.</td>
+            </tr>
+            <tr>
+                <th>403</th>
+                <td>Forbidden, You are not subscribed to this product: <i>{{partNumber}}</i></td>
+            </tr>
+        </tbody></table>
+        <h4 id="price">Price</h4>
+        <table>
+            <tbody><tr>
+                <th>Request</th>
+                <td colspan="3">Retrieves the current price of a certain product</td>
+            </tr>
+            <tr>
+                <th>Url</th>
+                <td colspan="3">https://api.mcmaster.com/v1/products/<i>{{partNumber}}</i>/price</td>
+            </tr>
+            <tr>
+                <th>Method</th>
+                <td colspan="3">GET</td>
+            </tr>
+            <tr>
+                <th>Request Body</th>
+                <td colspan="3">N/A</td>
+            </tr>
+            <tr>
+                <th rowspan="2">Success Responses</th>
+                <th>Example</th>
+                <td colspan="2">
+                    <code>[<br>&nbsp;&nbsp;&nbsp;&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Amount": 3.46,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"MinimumQuantity": 1,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"UnitOfMeasure": "Each"<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>]</code>
+                </td>
+            </tr>
+            <tr>
+                <th>Codes</th>
+                <th>200</th>
+                <td>OK</td>
+            </tr>
+            <tr>
+                <th rowspan="3">Error Responses</th>
+                <th>Example</th>
+                <td colspan="2">
+                    <code>{<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorCode": 403,<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorMessage": "EXPIRED_AUTHORIZATION_TOKEN",<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorDescription": "Invalid authorization token: <i>{{authToken}}</i>. Please log in again to create a new one."<br>}</code>
+                </td>
+            </tr>
+            <tr>
+                <th rowspan="2">Codes</th>
+                <th>403</th>
+                <td>Forbidden, Invalid authorization token: <i>{{authToken}}</i>. Please log in again
+                    to create a new one.</td>
+            </tr>
+            <tr>
+                <th>403</th>
+                <td>Forbidden, You are not subscribed to this product: <i>{{partNumber}}</i></td>
+            </tr>
+        </tbody></table>
+        <h4 id="image">Image</h4>
+        <table>
+            <tbody><tr>
+                <th>Request</th>
+                <td colspan="3">Retrieves an image from a relative path</td>
+            </tr>
+            <tr>
+                <th>Url</th>
+                <td colspan="3">https://api.mcmaster.com/v1/images/<i>{{imagePath}}</i></td>
+            </tr>
+            <tr>
+                <th>Method</th>
+                <td colspan="3">GET</td>
+            </tr>
+            <tr>
+                <th>Request Body</th>
+                <td colspan="3">N/A</td>
+            </tr>
+            <tr>
+                <th rowspan="2">Success Responses</th>
+                <th>Example</th>
+                <td colspan="2"><code>The requested image file</code></td>
+            </tr>
+            <tr>
+                <th>Codes</th>
+                <th>200</th>
+                <td>OK</td>
+            </tr>
+            <tr>
+                <th rowspan="4">Error Responses</th>
+                <th>Example</th>
+                <td colspan="2">
+                    <code>{<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorCode": 400,<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorMessage": "BAD_REQUEST",<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorDescription": "Invalid file path requested"<br>}</code>
+                </td>
+            </tr>
+            <tr>
+                <th rowspan="3">Codes</th>
+                <th>400</th>
+                <td>Bad Request, Invalid file path requested</td>
+            </tr>
+            <tr>
+                <th>400</th>
+                <td>Bad Request, Invalid file type requested</td>
+            </tr>
+            <tr>
+                <th>403</th>
+                <td>Forbidden, Invalid authorization token: <i>{{authToken}}</i>. Please log in again
+                    to create a new one.</td>
+            </tr>
+        </tbody></table>
+        <h4 id="cAD">CAD</h4>
+        <table>
+            <tbody><tr>
+                <th>Request</th>
+                <td colspan="3">Retrieves a CAD file from a relative path</td>
+            </tr>
+            <tr>
+                <th>Url</th>
+                <td colspan="3">https://api.mcmaster.com/v1/cad/<i>{{cadPath}}</i></td>
+            </tr>
+            <tr>
+                <th>Method</th>
+                <td colspan="3">GET</td>
+            </tr>
+            <tr>
+                <th>Request Body</th>
+                <td colspan="3">N/A</td>
+            </tr>
+            <tr>
+                <th rowspan="2">Success Responses</th>
+                <th>Example</th>
+                <td colspan="2"><code>The requested CAD file</code></td>
+            </tr>
+            <tr>
+                <th>Codes</th>
+                <th>200</th>
+                <td>OK</td>
+            </tr>
+            <tr>
+                <th rowspan="4">Error Responses</th>
+                <th>Example</th>
+                <td colspan="2">
+                    <code>{<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorCode": 400,<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorMessage": "BAD_REQUEST",<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorDescription": "Invalid file path requested"<br>}</code>
+                </td>
+            </tr>
+            <tr>
+                <th rowspan="3">Codes</th>
+                <th>400</th>
+                <td>Bad Request, Invalid file path requested</td>
+            </tr>
+            <tr>
+                <th>400</th>
+                <td>Bad Request, Invalid file type requested</td>
+            </tr>
+            <tr>
+                <th>403</th>
+                <td>Forbidden, Invalid authorization token: <i>{{authToken}}</i>. Please log in again
+                    to create a new one.</td>
+            </tr>
+        </tbody></table>
+        <h4 id="datasheet">Datasheet</h4>
+        <table>
+            <tbody><tr>
+                <th>Request</th>
+                <td colspan="3">Retrieves a datasheet from a relative path</td>
+            </tr>
+            <tr>
+                <th>Url</th>
+                <td colspan="3">https://api.mcmaster.com/v1/datasheets/<i>{{dataSheetPath}}</i></td>
+            </tr>
+            <tr>
+                <th>Method</th>
+                <td colspan="3">GET</td>
+            </tr>
+            <tr>
+                <th>Request Body</th>
+                <td colspan="3">N/A</td>
+            </tr>
+            <tr>
+                <th rowspan="2">Success Responses</th>
+                <th>Example</th>
+                <td colspan="2"><code>The requested datasheet</code></td>
+            </tr>
+            <tr>
+                <th>Codes</th>
+                <th>200</th>
+                <td>OK</td>
+            </tr>
+            <tr>
+                <th rowspan="4">Error Responses</th>
+                <th>Example</th>
+                <td colspan="2">
+                    <code>{<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorCode": 400,<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorMessage": "BAD_REQUEST",<br>&nbsp;&nbsp;&nbsp;&nbsp;"ErrorDescription": "Invalid file type requested"<br>}</code>
+                </td>
+            </tr>
+            <tr>
+                <th rowspan="3">Codes</th>
+                <th>400</th>
+                <td>Bad Request, Invalid file type requested</td>
+            </tr>
+            <tr>
+                <th>400</th>
+                <td>Bad Request, Invalid file path requested</td>
+            </tr>
+            <tr>
+                <th>403</th>
+                <td>Forbidden, Invalid authorization token: <i>{{authToken}}</i>. Please log in again
+                    to create a new one.</td>
+            </tr>
+        </tbody></table>
+    </div></div></div>
+      </div>
+
+      <div>
+        <div class="reader-message"></div>
+      </div>
+      <div aria-owns="toolbar"></div>
+    </div>
+  
+
+</body></html>
