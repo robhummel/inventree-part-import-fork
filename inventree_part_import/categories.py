@@ -1,12 +1,18 @@
+from __future__ import annotations
+
 import sys
 from dataclasses import asdict, dataclass
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
-from cutie import prompt_yes_or_no
-from error_helper import hint, info, success, warning
+from cutie import prompt_yes_or_no, select, select_multiple
+from error_helper import BOLD, BOLD_END, hint, info, prompt, prompt_input, success, warning
 from inventree.api import InvenTreeAPI
 from inventree.base import ParameterTemplate
 from inventree.part import PartCategory, PartCategoryParameterTemplate
+from thefuzz import fuzz
+
+if TYPE_CHECKING:
+    from .suppliers.base import ApiPart
 
 from inventree_part_import.exceptions import InvenTreeObjectCreationError
 
@@ -460,3 +466,202 @@ def setup_config_from_inventree(inventree_api: InvenTreeAPI):
         del root_category["parent"]
 
     return category_tree, parameters
+
+
+class CategoryCreator:
+    def __init__(
+        self,
+        inventree_api: InvenTreeAPI,
+        category_map: dict[str, Category],
+        parameter_map: dict[str, list[Parameter]],
+        parameter_templates: dict[str, ParameterTemplate],
+    ):
+        self.api = inventree_api
+        self.category_map = category_map
+        self.parameter_map = parameter_map
+        self.parameter_templates = parameter_templates
+
+    def create_from_api_part(self, api_part: ApiPart) -> Category | None:
+        confirmed_path = self._edit_path(api_part.category_path)
+        if confirmed_path is None:
+            return None
+
+        part_category = self._create_inventree_categories(confirmed_path)
+        if part_category is None:
+            return None
+
+        selected_param_names, new_param_units = self._select_parameters(api_part.parameters)
+        self._write_configs(confirmed_path, selected_param_names, new_param_units)
+        self._create_parameter_templates(new_param_units)
+        self._link_parameters_to_category(part_category, selected_param_names)
+
+        category_stub = CategoryStub(
+            name=confirmed_path[-1],
+            path=confirmed_path,
+            description=confirmed_path[-1],
+            ignore=False,
+            structural=False,
+            aliases=[],
+            parameters=selected_param_names,
+        )
+        category = Category.from_stub(category_stub, part_category)
+        self._update_maps(category, new_param_units)
+        return category
+
+    def _edit_path(self, category_path: list[str]) -> list[str] | None:
+        info(f"DigiKey category path: {' / '.join(category_path)}", end="\n")
+        prompt("select action for category path")
+        choices = [
+            "Confirm as-is",
+            "Truncate (drop trailing segments)",
+            "Rename segments",
+            f"{BOLD}Skip ...{BOLD_END}",
+        ]
+        index = select(choices, deselected_prefix="  ", selected_prefix="> ")
+        if index == 3:
+            return None
+        if index == 0:
+            return list(category_path)
+        if index == 1:
+            raw = prompt_input(f"segments to drop (1-{len(category_path) - 1})")
+            n = max(1, min(int(raw or "1"), len(category_path) - 1))
+            return list(category_path[:-n])
+        # index == 2: rename
+        renamed: list[str] = []
+        for segment in category_path:
+            new_name = prompt_input(f"name for '{segment}' (blank to keep)") or segment
+            renamed.append(new_name)
+        return renamed
+
+    def _create_inventree_categories(self, path: list[str]) -> PartCategory | None:
+        by_pk: dict[Any, PartCategory] = {cat.pk: cat for cat in PartCategory.list(self.api)}
+        existing: dict[tuple[str, ...], PartCategory] = {}
+        for cat in by_pk.values():
+            segments: list[str] = [cat.name]
+            parent = cat
+            while parent := by_pk.get(parent.parent):
+                segments.insert(0, parent.name)
+            existing[tuple(segments)] = cat
+
+        parent_pk: int | None = None
+        part_category: PartCategory | None = None
+        for i in range(1, len(path) + 1):
+            segment_path = tuple(path[:i])
+            if cat := existing.get(segment_path):
+                parent_pk = cast(int, cat.pk)
+                part_category = cat
+                continue
+            info(f"creating category '{'/'.join(segment_path)}' ...")
+            part_category = PartCategory.create(
+                self.api,
+                {
+                    "name": path[i - 1],
+                    "description": path[i - 1],
+                    "structural": False,
+                    "parent": parent_pk,
+                },
+            )
+            if part_category is None:
+                raise InvenTreeObjectCreationError(PartCategory)
+            parent_pk = cast(int, part_category.pk)
+
+        return part_category
+
+    def _select_parameters(
+        self, api_parameters: dict[str, str]
+    ) -> tuple[list[str], dict[str, str]]:
+        param_names = list(api_parameters.keys())
+        param_values = list(api_parameters.values())
+
+        max_val_len = max((len(v) for v in param_values), default=0)
+        choices = [
+            f"{v.ljust(max_val_len)} | {n}"
+            for n, v in zip(param_names, param_values)
+        ]
+
+        ticked = [
+            i
+            for i, name in enumerate(param_names)
+            if any(fuzz.partial_ratio(name.lower(), key) >= 80 for key in self.parameter_map)
+        ]
+
+        prompt(
+            "select parameters to add to this category "
+            "(SPACEBAR to toggle, ENTER to confirm)",
+            end="\n",
+        )
+        selected_indices = select_multiple(
+            choices,
+            ticked_indices=ticked,
+            deselected_unticked_prefix="  [ ] ",
+            deselected_ticked_prefix="  [x] ",
+            selected_unticked_prefix="> [ ] ",
+            selected_ticked_prefix="> [x] ",
+        )
+
+        selected_names = [param_names[i] for i in selected_indices]
+
+        new_param_units: dict[str, str] = {}
+        for name in selected_names:
+            if not any(fuzz.partial_ratio(name.lower(), key) >= 80 for key in self.parameter_map):
+                units = prompt_input(f"units for '{name}' (blank if none)") or ""
+                new_param_units[name] = units
+
+        return selected_names, new_param_units
+
+    def _write_configs(
+        self, path: list[str], param_names: list[str], new_param_units: dict[str, str]
+    ) -> None:
+        with update_config_file(CATEGORIES_CONFIG) as categories_config:
+            node: dict[str, Any] = categories_config
+            for segment in path[:-1]:
+                if node.get(segment) is None:
+                    node[segment] = {}
+                node = node[segment]
+            leaf: dict[str, Any] = {}
+            if param_names:
+                leaf["_parameters"] = param_names
+            node[path[-1]] = leaf if leaf else None
+
+        if new_param_units:
+            with update_config_file(PARAMETERS_CONFIG) as parameters_config:
+                for name, units in new_param_units.items():
+                    entry: dict[str, Any] = {}
+                    if units:
+                        entry["_unit"] = units
+                    parameters_config[name] = entry if entry else None
+
+    def _create_parameter_templates(self, new_param_units: dict[str, str]) -> None:
+        for name, units in new_param_units.items():
+            info(f"creating parameter template '{name}' ...")
+            template = ParameterTemplate.create(
+                self.api,
+                {"name": name, "description": name, "units": units},
+            )
+            if template is None:
+                raise InvenTreeObjectCreationError(ParameterTemplate)
+            self.parameter_templates[name] = template
+
+    def _link_parameters_to_category(
+        self, part_category: PartCategory, selected_param_names: list[str]
+    ) -> None:
+        for name in selected_param_names:
+            if template := self.parameter_templates.get(name):
+                info(f"linking parameter '{name}' to '{part_category.pathstring}' ...")
+                link = PartCategoryParameterTemplate.create(
+                    self.api,
+                    {"category": part_category.pk, "template": template.pk},
+                )
+                if link is None:
+                    raise InvenTreeObjectCreationError(PartCategoryParameterTemplate)
+
+    def _update_maps(self, category: Category, new_param_units: dict[str, str]) -> None:
+        for alias in (*category.aliases, category.name):
+            self.category_map[alias.lower()] = category
+
+        for name, units in new_param_units.items():
+            parameter = Parameter(name=name, description=name, aliases=[], units=units)
+            if existing := self.parameter_map.get(name.lower()):
+                existing.append(parameter)
+            else:
+                self.parameter_map[name.lower()] = [parameter]

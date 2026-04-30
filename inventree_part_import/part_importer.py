@@ -16,7 +16,7 @@ from requests.compat import quote
 from requests.exceptions import HTTPError
 from thefuzz import fuzz
 
-from .categories import Category, setup_categories_and_parameters
+from .categories import Category, CategoryCreator, setup_categories_and_parameters
 from .config import CATEGORIES_CONFIG, CONFIG, get_config, get_pre_creation_hooks
 from .exceptions import InvenTreeObjectCreationError
 from .inventree_helpers import (
@@ -45,10 +45,15 @@ class ImportResult(Enum):
 
 class PartImporter:
     def __init__(
-        self, inventree_api: InvenTreeAPI, interactive: bool = False, verbose: bool = False
+        self,
+        inventree_api: InvenTreeAPI,
+        interactive: bool = False,
+        allow_category_creation: bool = False,
+        verbose: bool = False,
     ):
         self.api = inventree_api
         self.interactive = interactive
+        self.allow_category_creation = allow_category_creation
         self.verbose = verbose
 
         # preload pre_creation_hooks
@@ -62,6 +67,17 @@ class PartImporter:
             for category in self.category_map.values()
         }
         self.categories = set(self.category_map.values())
+
+        self.category_creator: CategoryCreator | None = (
+            CategoryCreator(
+                inventree_api,
+                self.category_map,
+                self.parameter_map,
+                self.parameter_templates,
+            )
+            if allow_category_creation
+            else None
+        )
 
     def import_part(
         self,
@@ -184,7 +200,11 @@ class PartImporter:
         else:
             if not api_part.finalize():
                 return ImportResult.FAILURE
-            result = self.create_manufacturer_part(api_part, part)
+            result = self.create_manufacturer_part(
+                api_part,
+                part,
+                category_creator=self.category_creator if supplier.name == "DigiKey" else None,
+            )
             if isinstance(result, ImportResult):
                 return result
             manufacturer_part, part = result
@@ -251,7 +271,8 @@ class PartImporter:
         self,
         api_part: ApiPart,
         part: Part | None = None,
-    ):
+        category_creator: "CategoryCreator | None" = None,
+    ) -> "tuple[ManufacturerPart, Part] | ImportResult":
         part_data = api_part.get_part_data()
         if part or (part := get_part(self.api, api_part.MPN)):
             update_object_data(part, part_data, f"part {api_part.MPN}")
@@ -266,7 +287,11 @@ class PartImporter:
                     return ImportResult.FAILURE
 
                 prompt(f"failed to match category for '{path_str}', select category")
-                if not (category := self.select_category(api_part.category_path)):
+                if not (category := self.select_category(
+                    api_part.category_path,
+                    api_part=api_part,
+                    category_creator=category_creator,
+                )):
                     return ImportResult.FAILURE
 
                 category.add_alias(api_part.category_path[-1])
@@ -292,7 +317,12 @@ class PartImporter:
 
         return manufacturer_part, part
 
-    def select_category(self, category_path: list[str]):
+    def select_category(
+        self,
+        category_path: list[str],
+        api_part: ApiPart | None = None,
+        category_creator: "CategoryCreator | None" = None,
+    ) -> Category | None:
         search_terms = [category_path[-1], " ".join(category_path[-2:])]
 
         def rate_category(category: Category):
@@ -306,17 +336,31 @@ class PartImporter:
 
         max_matches = int(get_config().get("interactive_category_matches", 5))
         N_MATCHES = min(max_matches, len(category_matches))
+        create_option = category_creator is not None and api_part is not None
         choices = [
             *(" / ".join(category.path) for category in category_matches[:N_MATCHES]),
             f"{BOLD}Enter Manually ...{BOLD_END}",
+            *(
+                [f"{BOLD}Create New Category ...{BOLD_END}"]
+                if create_option
+                else []
+            ),
             f"{BOLD}Skip ...{BOLD_END}",
         ]
+        CREATE_IDX = N_MATCHES + 1 if create_option else -1
+        SKIP_IDX = N_MATCHES + 1 + (1 if create_option else 0)
         while True:
             index = select(choices, deselected_prefix="  ", selected_prefix="> ")
-            if index == N_MATCHES + 1:
+            if index == SKIP_IDX:
                 return None
             elif index < N_MATCHES:
                 return category_matches[index]
+            elif index == CREATE_IDX:
+                assert category_creator is not None and api_part is not None
+                category = category_creator.create_from_api_part(api_part)
+                if category is not None:
+                    self.categories.add(category)
+                return category
 
             name = prompt_input("category name")
             if (category := self.category_map.get(name.lower())) and category.name == name:
