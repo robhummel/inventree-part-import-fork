@@ -249,6 +249,29 @@ def get_parameters_config(inventree_api: InvenTreeAPI):
         return None
 
 
+def sync_categories(inventree_api: InvenTreeAPI):
+    from ..categories import setup_config_from_inventree
+
+    assert _config_dir is not None  # TODO
+    categories_config = _config_dir / CATEGORIES_CONFIG
+    parameters_config = _config_dir / PARAMETERS_CONFIG
+
+    if categories_config.is_file() or parameters_config.is_file():
+        existing = [f for f in (CATEGORIES_CONFIG, PARAMETERS_CONFIG) if (_config_dir / f).is_file()]
+        warning(f"this will overwrite: {', '.join(existing)}")
+        if not prompt_yes_or_no("continue?", default_is_yes=False):
+            info("sync cancelled")
+            return
+
+    info("fetching categories and parameters from InvenTree ...")
+    categories, parameters = setup_config_from_inventree(inventree_api)
+
+    categories_config.write_text(yaml_dump(categories), encoding="utf-8")
+    parameters_config.write_text(yaml_dump(parameters), encoding="utf-8")
+    success(f"synced categories to '{categories_config}'")
+    success(f"synced parameters to '{parameters_config}'")
+
+
 def setup_default_configuration_files(inventree_api: InvenTreeAPI):
     prompt("setup default categories/parameters configuration")
     choices = [
