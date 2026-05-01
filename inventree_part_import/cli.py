@@ -37,6 +37,7 @@ P = ParamSpec("P")
 class PartInput(NamedTuple):
     mpn: str
     name: str | None = None
+    description: str | None = None
 
 
 def handle_errors(func: Callable[P, None]) -> Callable[P, None]:
@@ -113,6 +114,15 @@ InteractiveChoices = click.Choice(("default", "false", "true", "twice", "twice-a
         "instead. For file imports, add a 'name' column to the file instead."
     ),
 )
+@click.option(
+    "--description",
+    default=None,
+    help=(
+        "Custom description for a single MPN input. Used for the InvenTree part description and "
+        "manufacturer part description. The supplier part description still uses the retrieved "
+        "API data."
+    ),
+)
 @handle_errors
 def inventree_part_import(
     context: click.Context,
@@ -132,6 +142,7 @@ def inventree_part_import(
     db_path: Path | None = None,
     version: bool = False,
     name: str | None = None,
+    description: str | None = None,
 ):
     """Import supplier parts into InvenTree.
 
@@ -320,7 +331,16 @@ def inventree_part_import(
             if len(cli_part_inputs) > 1:
                 warning("--name applies to all part inputs; use a 'name' column in a file for per-part names")
             parts = [
-                PartInput(mpn=p.mpn, name=p.name or name) if isinstance(p, PartInput) else p
+                PartInput(mpn=p.mpn, name=p.name or name, description=p.description) if isinstance(p, PartInput) else p
+                for p in parts
+            ]
+
+        if description:
+            cli_part_inputs = [p for p in parts if isinstance(p, PartInput)]
+            if len(cli_part_inputs) > 1:
+                warning("--description applies to all part inputs")
+            parts = [
+                PartInput(mpn=p.mpn, name=p.name, description=p.description or description) if isinstance(p, PartInput) else p
                 for p in parts
             ]
 
@@ -348,7 +368,7 @@ def inventree_part_import(
     def _import_part(part: PartInput | Part):
         if isinstance(part, Part):
             return importer.import_part(part.name, part, supplier, only_supplier)
-        return importer.import_part(part.mpn, None, supplier, only_supplier, part_name=part.name)
+        return importer.import_part(part.mpn, None, supplier, only_supplier, part_name=part.name, part_description=part.description)
 
     def _part_label(part: PartInput | Part) -> str:
         if isinstance(part, Part):
