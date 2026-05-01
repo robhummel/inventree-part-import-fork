@@ -34,6 +34,7 @@ class ApiPart:
     price_breaks: dict[int | float, float]
     currency: str
     session: Session | None = None
+    part_name: str | None = None
 
     def __post_init__(self):
         self._fix_urls()
@@ -50,14 +51,17 @@ class ApiPart:
         return True
 
     def get_part_data(self):
-        return {
-            "name": self.MPN,
+        data: dict[str, Any] = {
+            "name": self.part_name or self.MPN,
             "description": self.description[:250],
             "link": self.manufacturer_link[:200],
             "active": True,
             "component": True,
             "purchaseable": True,
         }
+        if self.part_name:
+            data["IPN"] = self.MPN[:100]
+        return data
 
     def get_manufacturer_part_data(self):
         return {
