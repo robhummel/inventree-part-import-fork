@@ -87,6 +87,7 @@ class PartImporter:
         supplier_id: str | None = None,
         only_supplier: bool = False,
         part_name: str | None = None,
+        part_description: str | None = None,
     ):
         info(f"searching for {search_term} ...", end="\n")
         import_result = ImportResult.SUCCESS
@@ -119,7 +120,7 @@ class PartImporter:
                 continue
 
             try:
-                import_result |= self.import_supplier_part(supplier, api_part, existing_part, part_name=part_name)
+                import_result |= self.import_supplier_part(supplier, api_part, existing_part, part_name=part_name, part_description=part_description)
             except HTTPError as e:
                 import_result = ImportResult.ERROR
 
@@ -185,11 +186,13 @@ class PartImporter:
         index = select(choices, deselected_prefix="  ", selected_prefix="> ")
         return [*api_parts, None][index]
 
-    def import_supplier_part(self, supplier: Company, api_part: ApiPart, part: Part | None = None, part_name: str | None = None):
+    def import_supplier_part(self, supplier: Company, api_part: ApiPart, part: Part | None = None, part_name: str | None = None, part_description: str | None = None):
         import_result = ImportResult.SUCCESS
 
         if part_name:
             api_part.part_name = part_name
+        if part_description:
+            api_part.part_description = part_description
 
         if supplier_part := get_supplier_part(self.api, supplier, api_part.SKU):
             info(f"found existing {supplier.name} part {supplier_part.SKU} ...")

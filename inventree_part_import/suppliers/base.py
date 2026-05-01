@@ -35,6 +35,7 @@ class ApiPart:
     currency: str
     session: Session | None = None
     part_name: str | None = None
+    part_description: str | None = None
 
     def __post_init__(self):
         self._fix_urls()
@@ -53,7 +54,7 @@ class ApiPart:
     def get_part_data(self):
         data: dict[str, Any] = {
             "name": self.part_name or self.MPN,
-            "description": self.description[:250],
+            "description": (self.part_description or self.description)[:250],
             "link": self.manufacturer_link[:200],
             "active": True,
             "component": True,
@@ -66,7 +67,7 @@ class ApiPart:
     def get_manufacturer_part_data(self):
         return {
             "MPN": self.MPN,
-            "description": self.description[:250],
+            "description": (self.part_description or self.description)[:250],
             "link": self.manufacturer_link[:200],
         }
 
