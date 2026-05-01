@@ -1,7 +1,7 @@
 import importlib.metadata
 import logging
 from pathlib import Path
-from typing import Any, Callable, Literal, Never, ParamSpec, cast
+from typing import Any, Callable, Literal, NamedTuple, Never, ParamSpec, cast
 import functools
 
 import click
@@ -32,6 +32,11 @@ from .part_importer import ImportResult, PartImporter
 from .suppliers import get_suppliers, setup_supplier_companies
 
 P = ParamSpec("P")
+
+
+class PartInput(NamedTuple):
+    mpn: str
+    name: str | None = None
 
 
 def handle_errors(func: Callable[P, None]) -> Callable[P, None]:
@@ -99,6 +104,15 @@ InteractiveChoices = click.Choice(("default", "false", "true", "twice", "twice-a
 @click.option("--mcmaster-sync", is_flag=True, help="Sync McMaster product data to DuckDB.")
 @click.option("--db-path", type=click.Path(path_type=Path), help="Path to DuckDB database for sync.")
 @click.option("--version", is_flag=True, help="Show version and exit.")
+@click.option(
+    "-n",
+    "--name",
+    default=None,
+    help=(
+        "Custom part name for a single MPN input. The MPN will be stored as the InvenTree IPN "
+        "instead. For file imports, add a 'name' column to the file instead."
+    ),
+)
 @handle_errors
 def inventree_part_import(
     context: click.Context,
@@ -117,6 +131,7 @@ def inventree_part_import(
     mcmaster_sync: bool = False,
     db_path: Path | None = None,
     version: bool = False,
+    name: str | None = None,
 ):
     """Import supplier parts into InvenTree.
 
@@ -267,7 +282,7 @@ def inventree_part_import(
     elif not (inventree_api := setup_inventree_api()):
         return
 
-    parts: list[str | Part]
+    parts: list[PartInput | Part]
     if category_path := update_recursive or update:
         if update_recursive and update:
             hint("--update is being overridden by --update-recursive")
@@ -287,8 +302,8 @@ def inventree_part_import(
         ]
     else:
         parts = []
-        for name in inputs:
-            path = Path(name)
+        for input_str in inputs:
+            path = Path(input_str)
             if path.is_file():
                 if (file_parts := load_tabular_data(path)) is None:
                     return
@@ -296,9 +311,18 @@ def inventree_part_import(
             elif path.exists():
                 warning(f"skipping '{path}' (path exists, but is not a file)")
             else:
-                parts.append(name)
+                stripped = input_str.strip()
+                if stripped:
+                    parts.append(PartInput(mpn=stripped))
 
-        parts = list(filter(bool, (part.strip() for part in parts)))
+        if name:
+            cli_part_inputs = [p for p in parts if isinstance(p, PartInput)]
+            if len(cli_part_inputs) > 1:
+                warning("--name applies to all part inputs; use a 'name' column in a file for per-part names")
+            parts = [
+                PartInput(mpn=p.mpn, name=p.name or name) if isinstance(p, PartInput) else p
+                for p in parts
+            ]
 
     if not parts:
         info("nothing to import.")
@@ -321,14 +345,20 @@ def inventree_part_import(
     failed_parts: list[str | Part] = []
     incomplete_parts: list[str | Part] = []
 
+    def _import_part(part: PartInput | Part):
+        if isinstance(part, Part):
+            return importer.import_part(part.name, part, supplier, only_supplier)
+        return importer.import_part(part.mpn, None, supplier, only_supplier, part_name=part.name)
+
+    def _part_label(part: PartInput | Part) -> str:
+        if isinstance(part, Part):
+            return part.name
+        return f"{part.mpn}" + (f" ({part.name})" if part.name else "")
+
     try:
         last_import_result = None
         for index, part in enumerate(parts):
-            last_import_result = (
-                importer.import_part(part.name, part, supplier, only_supplier)
-                if isinstance(part, Part)
-                else importer.import_part(part, None, supplier, only_supplier)
-            )
+            last_import_result = _import_part(part)
             print()
             match last_import_result:
                 case ImportResult.SUCCESS:
@@ -350,11 +380,7 @@ def inventree_part_import(
 
             importer.interactive = True
             for part in parts2:
-                import_result = (
-                    importer.import_part(part.name, part, supplier, only_supplier)
-                    if isinstance(part, Part)
-                    else importer.import_part(part, None, supplier, only_supplier)
-                )
+                import_result = _import_part(part)
                 match import_result:
                     case ImportResult.SUCCESS:
                         pass
@@ -366,14 +392,10 @@ def inventree_part_import(
 
     finally:
         if failed_parts:
-            failed_parts_str = "\n".join(
-                (part.name if isinstance(part, Part) else part for part in failed_parts)
-            )
+            failed_parts_str = "\n".join(_part_label(part) for part in failed_parts)
             error(f"the following parts failed to import:\n{failed_parts_str}\n", prefix="")
         if incomplete_parts:
-            incomplete_parts_str = "\n".join(
-                (part.name if isinstance(part, Part) else part for part in incomplete_parts)
-            )
+            incomplete_parts_str = "\n".join(_part_label(part) for part in incomplete_parts)
             warning(f"the following parts are incomplete:\n{incomplete_parts_str}\n", prefix="")
 
     if not failed_parts and not incomplete_parts:
@@ -407,7 +429,10 @@ def load_tabular_data_simple(path: Path):
     return cast(list[str], data.get_col(0))
 
 
-def load_tabular_data(path: Path):
+NAME_COLUMN_HEADERS = {"name", "part_name", "custom_name", "part name", "custom name"}
+
+
+def load_tabular_data(path: Path) -> list[PartInput] | None:
     info(f"reading {path.name} ...")
     with path.open(encoding="utf-8") as file:
         try:
@@ -415,7 +440,7 @@ def load_tabular_data(path: Path):
         except UnsupportedFormat:
             # try to import the file as a single column csv file
             if column := load_single_column_csv(path):
-                return column
+                return [PartInput(mpn=mpn) for mpn in column]
             error(f"{path.suffix} is not a supported file format")
             return None
         except TablibException as e:
@@ -446,7 +471,20 @@ def load_tabular_data(path: Path):
         index = select(sorted_headers, deselected_prefix="  ", selected_prefix="> ")
         column_index = headers[sorted_headers[index]]
 
-    return cast(list[str], data.get_col(column_index))
+    mpn_column = cast(list[str], data.get_col(column_index))
+
+    headers_lower = {h.lower(): i for h, i in headers.items()}
+    name_col_index = next(
+        (headers_lower[h] for h in NAME_COLUMN_HEADERS if h in headers_lower), None
+    )
+    if name_col_index is not None:
+        name_column = cast(list[str], data.get_col(name_col_index))
+        return [
+            PartInput(mpn=mpn, name=part_name.strip() or None)
+            for mpn, part_name in zip(mpn_column, name_column)
+        ]
+
+    return [PartInput(mpn=mpn) for mpn in mpn_column]
 
 
 def load_single_column_csv(path: Path):

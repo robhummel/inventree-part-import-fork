@@ -51,6 +51,15 @@ def get_part(inventree_api: InvenTreeAPI, name: str):
     return None
 
 
+def get_part_by_ipn(inventree_api: InvenTreeAPI, ipn: str):
+    parts = Part.list(inventree_api, IPN=ipn)
+    if len(parts) == 1:
+        return parts[0]
+
+    assert len(parts) == 0
+    return None
+
+
 def get_category(inventree_api: InvenTreeAPI, category_path: str):
     name = category_path.split("/")[-1]
     for category in PartCategory.list(inventree_api, search=name):

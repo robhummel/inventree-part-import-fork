@@ -24,6 +24,7 @@ from .inventree_helpers import (
     get_manufacturer_part,
     get_parameter_templates,
     get_part,
+    get_part_by_ipn,
     get_supplier_part,
     update_object_data,
     upload_datasheet,
@@ -85,6 +86,7 @@ class PartImporter:
         existing_part: Part | None = None,
         supplier_id: str | None = None,
         only_supplier: bool = False,
+        part_name: str | None = None,
     ):
         info(f"searching for {search_term} ...", end="\n")
         import_result = ImportResult.SUCCESS
@@ -117,7 +119,7 @@ class PartImporter:
                 continue
 
             try:
-                import_result |= self.import_supplier_part(supplier, api_part, existing_part)
+                import_result |= self.import_supplier_part(supplier, api_part, existing_part, part_name=part_name)
             except HTTPError as e:
                 import_result = ImportResult.ERROR
 
@@ -183,8 +185,11 @@ class PartImporter:
         index = select(choices, deselected_prefix="  ", selected_prefix="> ")
         return [*api_parts, None][index]
 
-    def import_supplier_part(self, supplier: Company, api_part: ApiPart, part: Part | None = None):
+    def import_supplier_part(self, supplier: Company, api_part: ApiPart, part: Part | None = None, part_name: str | None = None):
         import_result = ImportResult.SUCCESS
+
+        if part_name:
+            api_part.part_name = part_name
 
         if supplier_part := get_supplier_part(self.api, supplier, api_part.SKU):
             info(f"found existing {supplier.name} part {supplier_part.SKU} ...")
@@ -274,7 +279,11 @@ class PartImporter:
         category_creator: "CategoryCreator | None" = None,
     ) -> "tuple[ManufacturerPart, Part] | ImportResult":
         part_data = api_part.get_part_data()
-        if part or (part := get_part(self.api, api_part.MPN)):
+        if not part:
+            part = get_part(self.api, api_part.MPN)
+        if not part and api_part.part_name:
+            part = get_part_by_ipn(self.api, api_part.MPN)
+        if part:
             update_object_data(part, part_data, f"part {api_part.MPN}")
         else:
             for subcategory in reversed(api_part.category_path):
