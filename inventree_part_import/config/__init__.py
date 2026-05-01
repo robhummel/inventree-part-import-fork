@@ -263,8 +263,20 @@ def sync_categories(inventree_api: InvenTreeAPI):
             info("sync cancelled")
             return
 
+    existing_parameters: dict = {}
+    if parameters_config.is_file():
+        try:
+            existing_parameters = yaml.safe_load(parameters_config.read_text(encoding="utf-8")) or {}
+        except Exception:
+            pass
+
     info("fetching categories and parameters from InvenTree ...")
     categories, parameters = setup_config_from_inventree(inventree_api)
+
+    for name, fields in parameters.items():
+        if existing := existing_parameters.get(name):
+            if aliases := existing.get("_aliases"):
+                fields["_aliases"] = aliases
 
     categories_config.write_text(yaml_dump(categories), encoding="utf-8")
     parameters_config.write_text(yaml_dump(parameters), encoding="utf-8")
